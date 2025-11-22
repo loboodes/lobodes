@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  background: #ffffff;
+}
+@font-face {
+  font-family: 'HelveticaNeueW23';
+  src: url('fonts/HelveticaNeueW23-Regular.ttf') format('truetype');
+}
+#mainContent { padding: 10px; }
+/* هوية الهيدر باللون الأخضر */
+header { background: #005741; color: white; text-align: center; padding: 10px; }
+header h3 { margin: 3px 0; font-size: 16px; }
+h3 label { font-weight: bold; font-size: 18px; text-align: center; display: block; margin-bottom: 10px; }
+label { display: block; margin: 5px 0 2px; font-weight: bold; font-size: 12px; text-align: center; }
+input, textarea {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #c2c1c2;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+  font-size: 12px;
+  text-align: center;
+  background: transparent;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+}
+textarea { min-height: 40px; }
+button {
+  border: none;
+  padding: 8px 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  text-align: center;
+}
+button.printBtn { background: #555; color: white; }
+button.deleteBtn { background: red; color: white; }
+table { width:100%; border-collapse:collapse; font-size:12px; text-align:right; margin-bottom:15px; }
+table td, table th { border:1px solid #999; padding:2px; height:20px; }
+table tr:nth-child(even) { background:#f2f2f2; }
+
+#waiting-preview {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  justify-content:center;
+  margin-top:5px;
+}
+.preview-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.preview-image-wrapper img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 1px solid #999;
+  border-radius: 4px;
+}
+.remove-img-btn {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: red;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* نص فوق زر الاختيار */
+.radio-wrapper {
+  display: flex;
+  flex-direction: column; /* النص فوق الزر */
+  align-items: center;    /* توسيط النص والزر أفقياً */
+  gap: 3px;
+  font-size: 12px;
+}
+.radio-wrapper span {
+  font-weight: bold;
+}
+
+/* 📌 عند الطباعة فقط ضع الجدولين بجوار بعض */
+@media print {
+  .print-tables {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .print-tables > div {
+    flex: 1;
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="mainContent">
+  <header><h3>تقرير تنفيذ مبادرة نوعية</h3></header>
+
+  <!-- نموذج البيانات -->
+  <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+    <div style="width:200px;"><label>إدارة التعليم</label><input type="text" /></div>
+    <div style="width:200px;"><label>اسم المدرسة</label><input type="text" /></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:10px;">
+    <div><label> المنفذة</label><input type="text" /></div>
+    <div><label>عنوان المبادرة</label><input type="text" /></div>
+    <div><label>نوع المبادرة</label><input type="text" /></div>
+    <div><label>الفئة المستهدفة</label><input type="text" /></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:10px;">
+    <div><label>مكان التنفيذ</label><input type="text" /></div>
+    <div><label>مدة التنفيذ</label><input type="text" /></div>
+    <div><label> التاريخ من</label><input type="text" id="date1" placeholder="اختر التاريخ" style="flex:1;" readonly /></div>
+    <div><label> التاريخ الى</label><input type="text" id="date2" placeholder="اختر التاريخ" style="flex:1;" readonly /></div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(1,1fr); gap:5px; margin-bottom:10px;">
+    <div><label>وصف المبادرة</label><input type="text" /></div>
+  </div>
+
+  <!-- جدول المحاور فوق الأهداف -->
+<div>
+  <h4 style="text-align:center; margin:13px 0; background:#0aa2a9; color:white; padding:6px; border-radius:4px;">محاور المبادرة</h4>
+  <table>
+    <tbody>
+      <tr>
+        <td style="font-weight:bold; text-align:center; vertical-align:middle;">المحور</td>
+        <td><div class="radio-wrapper"><span>المعلمة</span><input type="radio"></div></td>
+        <td><div class="radio-wrapper"><span>الطالبة</span><input type="radio"></div></td>
+        <td><div class="radio-wrapper"><span>المنهج</span><input type="radio"></div></td>
+        <td><div class="radio-wrapper"><span>المدرسة</span><input type="radio"></div></td>
+        <td><div class="radio-wrapper"><span>المجتمع</span><input type="radio"></div></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+  <!-- ✅ الجدولين -->
+  <div class="print-tables">
+    <!-- جدول الأهداف -->
+    <div>
+      <h4 style="text-align:center; margin:13px 0; background:#0aa2a9; color:white; padding:6px; border-radius:4px;">الأهداف العامة للمبادرة</h4>
+      <table>
+        <tr>
+          <td style="width:30px;text-align:center;">1</td><td><input type="text" style="width:100%;border:none;"></td>
+          <td style="width:30px;text-align:center;">2</td><td><input type="text" style="width:100%;border:none;"></td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">3</td><td><input type="text" style="width:100%;border:none;"></td>
+          <td style="text-align:center;">4</td><td><input type="text" style="width:100%;border:none;"></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- جدول أدوات ومتطلبات التنفيذ -->
+    <div>
+      <h4 style="text-align:center; margin:13px 0; background:#0aa2a9; color:white; padding:6px; border-radius:4px;">أدوات ومتطلبات التنفيذ</h4>
+      <table>
+        <tr>
+          <td style="width:30px;text-align:center;">1</td><td><input type="text" style="width:100%;border:none;"></td>
+          <td style="width:30px;text-align:center;">2</td><td><input type="text" style="width:100%;border:none;"></td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">3</td><td><input type="text" style="width:100%;border:none;"></td>
+          <td style="text-align:center;">4</td><td><input type="text" style="width:100%;border:none;"></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <label style="font-weight:bold;">اسماء المشاركات</label>
+  <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 15px; text-align: center;">
+    <div><input type="text"></div><div><input type="text"></div><div><input type="text"></div>
+    <div><input type="text"></div><div><input type="text"></div><div><input type="text"></div>
+  </div>
+
+  <!-- رفع الصور -->
+  <input type="file" multiple accept="image/*" onchange="storeImages(event,'waiting')" />
+  <div id="waiting-counter" style="font-size:12px; color:#15445a; font-weight:bold;">عدد الصور المرفوعة: 0 / 4</div>
+  <div id="waiting-preview"></div>
+
+  <!-- مديرة المدرسة -->
+  <div id="directorField" style="display:flex; justify-content:center; margin-top:10px;">
+    <div style="width:200px;">
+      <label>مديرة المدرسة</label>
+      <input type="text" id="directorName" />
+    </div>
+  </div>
+
+  <!-- الأزرار -->
+  <button class="printBtn" onclick="printPDF('mainContent',this)">طباعة التقرير</button>
+</div>
+
+<script>
+let uploadedImages = {};
+
+document.addEventListener("DOMContentLoaded", function() {
+  const dateIds = ['date1','date2']; // حقول التاريخ من / إلى
+
+  dateIds.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      flatpickr(input, {
+        locale: 'ar',
+        disableMobile: true,
+        altInput: true,
+        altFormat: 'd-MM-yyyy هـ',
+        dateFormat: 'Y-m-d',
+        onChange: function(selectedDates, dateStr, instance) {
+          if (selectedDates.length > 0) {
+            const miladi = selectedDates[0];
+            miladi.setDate(miladi.getDate() - 1);
+            const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).format(miladi);
+            instance.altInput.value = hijri;
+          }
+        }
+      });
+    }
+  });
+});
+
+function storeImages(event,sectionId){
+  const files = Array.from(event.target.files);
+  const preview = document.getElementById(sectionId+'-preview');
+  preview.innerHTML='';
+  uploadedImages[sectionId]=files;
+  files.forEach((file,index)=>{
+    const wrapper=document.createElement('div');
+    wrapper.className='preview-image-wrapper';
+    const img=document.createElement('img');
+    const reader=new FileReader();
+    reader.onload=function(e){ img.src=e.target.result; }
+    reader.readAsDataURL(file);
+
+    const removeBtn=document.createElement('div');
+    removeBtn.className='remove-img-btn';
+    removeBtn.innerText='×';
+    removeBtn.onclick=()=>{ 
+      wrapper.remove(); 
+      uploadedImages[sectionId].splice(index,1); 
+      document.getElementById(sectionId+'-counter').innerText=`عدد الصور المرفوعة: ${uploadedImages[sectionId].length} / 4`; 
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(removeBtn);
+    preview.appendChild(wrapper);
+  });
+  document.getElementById(sectionId+'-counter').innerText=`عدد الصور المرفوعة: ${files.length} / 4`;
+}
+
+function printPDF(sectionId,btn){
+  btn.style.display="none";
+  const deleteBtn=document.querySelector('.deleteBtn');
+  if(deleteBtn) deleteBtn.style.display="none";
+
+  const element=document.getElementById(sectionId).cloneNode(true);
+
+  // حذف الهيدر وأزرار الملفات
+  const header = element.querySelector('header');
+  if(header) header.remove();
+  element.querySelectorAll('button,input[type="file"],#waiting-counter,#waiting-preview .remove-img-btn').forEach(el=>el.remove());
+
+  // تكبير الصور قبل التصدير
+  const images = element.querySelectorAll('#waiting-preview img');
+  images.forEach(img => {
+    img.style.width = '140px';
+    img.style.height = '130px';
+    img.style.objectFit = 'cover';
+  });
+
+  const wrapper=document.createElement('div');
+  wrapper.style.position='relative';
+  wrapper.style.width='210mm';
+  wrapper.style.height='296.5mm';
+  wrapper.style.padding='20mm';
+  wrapper.style.boxSizing='border-box';
+  wrapper.style.backgroundImage='url("images/background.png")';
+  wrapper.style.backgroundSize='cover';
+  wrapper.style.backgroundRepeat='no-repeat';
+  wrapper.style.backgroundPosition='center';
+  wrapper.appendChild(element);
+
+  html2pdf().set({
+    margin: 0,
+    filename:'تقرير-مبادرة-نوعية.pdf',
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:2,backgroundColor:null,useCORS:true},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+  }).from(wrapper).save().then(()=>{
+    btn.style.display="block";
+    if(deleteBtn) deleteBtn.style.display="block";
+  });
+}
+</script>
+</body>
+</html>

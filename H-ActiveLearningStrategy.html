@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>تقرير تنفيذ استراتيجية تعلّم نشط</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  background: #ffffff;
+}
+@font-face {
+  font-family: 'HelveticaNeueW23';
+  src: url('fonts/HelveticaNeueW23-Regular.ttf') format('truetype');
+}
+
+header {
+  background: #087558; /* هوية الهيدر */
+  color: white;
+  text-align: center;
+  padding: 10px;
+}
+header h3 {
+  margin: 3px 0;
+  font-size: 16px;
+}
+
+h3 label {
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+  display: block;
+  margin-bottom: 10px;
+}
+
+label {
+  display: block;
+  margin: 5px 0 2px;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #c2c1c2;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+  font-size: 12px;
+  text-align: center;
+  background: transparent;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+}
+
+textarea {
+  min-height: 40px;
+}
+
+button {
+  border: none;
+  padding: 8px 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  text-align: center;
+}
+
+button.printBtn {
+  background: #004d40; /* لون الأزرار بهويتك */
+  color: white;
+}
+button.deleteBtn {
+  background: red;
+  color: white;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  color: black;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+@media print {
+  body {
+    background: none !important;
+  }
+
+  input,
+  textarea,
+  label {
+    background: transparent !important;
+    color: black;
+    border-color: #c2c1c2;
+    margin-bottom: 20px !important;
+  }
+
+  /* إخفاء المعلمة والمديرة العلوي عند الطباعة */
+  #top-director {
+    display: none !important;
+  }
+
+  /* إخفاء الأزرار ومؤشرات رفع الصور */
+  button, #waiting-counter, #waiting-preview {
+    display: none !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="mainContent">
+  <header><h3>تقرير تنفيذ استراتيجية تعلّم نشط</h3></header>
+  <div id="waiting" class="tab-content active">
+
+    <!-- إدارة تعليم / المدرسة -->
+    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+      <div style="width:200px;"><label>إدارة التعليم</label><input type="text" id="eduDept" /></div>
+      <div style="width:200px;"><label>اسم المدرسة</label><input type="text" id="schoolName" /></div>
+    </div>
+
+    <!-- الاستراتيجية -->
+    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+      <div style="width:400px;"><label>الاستراتيجية المستخدمة</label><input type="text" id="strategyName" /></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px;">
+      <div><label>المادة</label><input type="text" id="subject" /></div>
+      <div><label>الوحدة الدراسية</label><input type="text" id="unit" /></div>
+      <div><label>موضوع الدرس</label><input type="text" id="lessonTopic" /></div>
+      <div><label>الصف</label><input type="text" id="grade" /></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px;">
+      <div><label>توزيع الطالبات</label><input type="text" id="studentsDistribution" /></div>
+      <div><label>العدد</label><input type="text" id="studentsCount" /></div>
+      <div>
+        <label>تاريخ التنفيذ</label>
+        <input type="text" id="date1" placeholder="اختر التاريخ" style="flex:1;" readonly />
+      </div>
+      <div><label>مدة التنفيذ</label><input type="text" id="duration" /></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(1,1fr); gap:5px;">
+      <div><label>وصف الاستراتيجية</label><input type="text" id="strategyDescription" /></div>
+    </div>
+
+    <label>أهداف الاستراتيجية</label>
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px;">
+      <input type="text" /><input type="text" />
+      <input type="text" /><input type="text" />
+    </div>
+
+    <label>خطوات تنفيذ الاستراتيجية</label>
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px;">
+      <input type="text" /><input type="text" />
+      <input type="text" /><input type="text" />
+    </div>
+
+    <label>الأدوات المستخدمة في تنفيذ الاستراتيجية</label>
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px;">
+      <input type="text" /><input type="text" />
+      <input type="text" /><input type="text" />
+    </div>
+
+    <!-- الشواهد -->
+    <label>الشواهد</label>
+    <input type="file" multiple accept="image/*" onchange="storeImages(event,'waiting')" />
+    <div id="waiting-counter" style="font-size:12px; color:#15445a; font-weight:bold;">عدد الصور المرفوعة: 0 / 4</div>
+    <div id="waiting-preview" style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;"></div>
+
+    <!-- المعلمة / مديرة المدرسة (أعلى النموذج في الشاشة فقط) -->
+    <div id="top-director" style="display:flex; gap:10px; justify-content:center; margin-bottom:5px;">
+      <div style="width:200px;"><label>اسم المعلمة</label><input type="text" id="healthGuide" /></div>
+      <div style="width:200px;"><label>مديرة المدرسة</label><input type="text" id="schoolDirector" /></div>
+    </div>
+
+    <!-- الأزرار -->
+    <button class="printBtn" onclick="printPDF('waiting',this)">طباعة التقرير</button>
+    <button class="deleteBtn" onclick="clearForm('waiting')">حذف البيانات</button>
+  </div>
+</div>
+
+<script>
+let uploadedImages = {};
+
+document.addEventListener("DOMContentLoaded", function() {
+  const dateIds = ['date1'];
+
+  dateIds.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      flatpickr(input, {
+        locale: 'ar',
+        disableMobile: true,
+        altInput: true,
+        altFormat: 'd-MM-yyyy هـ',
+        dateFormat: 'Y-m-d',
+        onChange: function(selectedDates, dateStr, instance) {
+          if (selectedDates.length > 0) {
+            const miladi = selectedDates[0];
+            miladi.setDate(miladi.getDate() - 1);
+            const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).format(miladi);
+            instance.altInput.value = hijri;
+          }
+        }
+      });
+    }
+  });
+});
+
+function saveForm(tabId) {
+  const tab = document.getElementById(tabId);
+  const data = {};
+  tab.querySelectorAll('input[type="text"],textarea').forEach(input => {
+    const key = input.previousElementSibling ? input.previousElementSibling.textContent : input.name;
+    data[key] = input.value;
+  });
+  localStorage.setItem(tabId + '-form', JSON.stringify(data));
+}
+
+function loadForm(tabId) {
+  const tab = document.getElementById(tabId);
+  const data = JSON.parse(localStorage.getItem(tabId + '-form') || '{}');
+  tab.querySelectorAll('input[type="text"],textarea').forEach(input => {
+    const key = input.previousElementSibling ? input.previousElementSibling.textContent : input.name;
+    if (data[key]) input.value = data[key];
+  });
+}
+
+function clearForm(tabId) {
+  const tab = document.getElementById(tabId);
+  tab.querySelectorAll('input[type="text"],textarea').forEach(input => input.value = '');
+  uploadedImages[tabId] = [];
+  updateCounter(tabId);
+  renderPreview(tabId);
+  localStorage.removeItem(tabId + '-form');
+}
+
+function storeImages(event, tabId) {
+  const files = event.target.files;
+  if (!uploadedImages[tabId]) uploadedImages[tabId] = [];
+  if (uploadedImages[tabId].length + files.length > 4) {
+    alert('مسموح برفع 4 صور فقط.');
+    event.target.value = '';
+    return;
+  }
+  for (let i = 0; i < files.length; i++) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      uploadedImages[tabId].push(e.target.result);
+      updateCounter(tabId);
+      renderPreview(tabId);
+      saveForm(tabId);
+    };
+    reader.readAsDataURL(files[i]);
+  }
+}
+
+function updateCounter(tabId) {
+  const counter = document.getElementById(tabId + '-counter');
+  if (counter) {
+    const count = uploadedImages[tabId]?.length || 0;
+    counter.textContent = 'عدد الصور المرفوعة: ' + count + ' / 4';
+    counter.style.color = count >= 4 ? 'red' : '#15445a';
+  }
+}
+
+function renderPreview(tabId) {
+  const preview = document.getElementById(tabId + '-preview');
+  preview.innerHTML = '';
+  (uploadedImages[tabId] || []).forEach((src, index) => {
+    const container = document.createElement('div');
+    container.style.position = 'relative';
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.width = '70px';
+    img.style.height = '70px';
+    img.style.objectFit = 'cover';
+    img.style.border = '1px solid #ccc';
+    img.style.borderRadius = '4px';
+    const btn = document.createElement('button');
+    btn.textContent = 'x';
+    btn.style.position = 'absolute';
+    btn.style.top = '2px';
+    btn.style.left = '50%';
+    btn.style.transform = 'translateX(-50%)';
+    btn.style.width = '18px';
+    btn.style.height = '18px';
+    btn.style.fontSize = '10px';
+    btn.style.background = 'red';
+    btn.style.color = 'white';
+    btn.style.border = '2px solid white';
+    btn.style.borderRadius = '50%';
+    btn.style.cursor = 'pointer';
+    btn.onclick = () => {
+      uploadedImages[tabId].splice(index, 1);
+      updateCounter(tabId);
+      renderPreview(tabId);
+      saveForm(tabId);
+    };
+    container.appendChild(img);
+    container.appendChild(btn);
+    preview.appendChild(container);
+  });
+}
+
+function printPDF(tabId, btn) {
+  const content = document.getElementById(tabId).cloneNode(true);
+  content.querySelectorAll(
+    'button,input[type="file"],#' + tabId + '-counter,#' + tabId + '-preview,#top-director'
+  ).forEach(el => el.remove());
+
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'relative';
+  wrapper.style.width = '210mm';
+  wrapper.style.height = '296.5mm';
+  wrapper.style.padding = '30mm 10mm 20mm 10mm';
+  wrapper.style.boxSizing = 'border-box';
+  wrapper.style.backgroundImage = 'url("images/background.png")';
+  wrapper.style.backgroundSize = 'cover';
+  wrapper.style.backgroundRepeat = 'no-repeat';
+  wrapper.style.backgroundPosition = 'center';
+  wrapper.appendChild(content);
+
+  const tabImages = uploadedImages[tabId] || [];
+  if (tabImages.length > 0) {
+    const imagesWrapper = document.createElement('div');
+    imagesWrapper.style.display = 'flex';
+    imagesWrapper.style.flexWrap = 'wrap';
+    imagesWrapper.style.justifyContent = 'center';
+    imagesWrapper.style.marginTop = '20px';
+    imagesWrapper.style.gap = '10px';
+
+    tabImages.forEach(src => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.style.width = '160px';
+      img.style.height = '160px';
+      img.style.objectFit = 'cover';
+      img.style.border = '1px solid #ccc';
+      img.style.borderRadius = '4px';
+      imagesWrapper.appendChild(img);
+    });
+
+    wrapper.appendChild(imagesWrapper);
+  }
+
+  const healthGuide = document.getElementById('healthGuide');
+  const schoolDirector = document.getElementById('schoolDirector');
+
+  const footerRow = document.createElement('div');
+  footerRow.style.display = 'flex';
+  footerRow.style.justifyContent = 'center';
+  footerRow.style.gap = '60px';
+  footerRow.style.marginTop = '20px';
+
+  const healthDiv = document.createElement('div');
+  healthDiv.style.textAlign = 'center';
+  healthDiv.innerHTML = `
+    <label style="font-weight:bold; display:block; margin-bottom:5px;">اسم المعلمة</label>
+    <input type="text" value="${healthGuide?.value || ''}" readonly
+      style="width:200px; text-align:center; border:1px solid #c2c1c2; border-radius:4px; padding:4px; background:transparent;" />
+  `;
+
+  const directorDiv = document.createElement('div');
+  directorDiv.style.textAlign = 'center';
+  directorDiv.innerHTML = `
+    <label style="font-weight:bold; display:block; margin-bottom:5px;">مديرة المدرسة</label>
+    <input type="text" value="${schoolDirector?.value || ''}" readonly
+      style="width:200px; text-align:center; border:1px solid #c2c1c2; border-radius:4px; padding:4px; background:transparent;" />
+  `;
+
+  footerRow.appendChild(healthDiv);
+  footerRow.appendChild(directorDiv);
+  wrapper.appendChild(footerRow);
+
+  html2pdf()
+    .set({
+      margin: 0,
+      filename: 'تقرير-استراتيجية-تعلم-نشط.pdf',
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 3, useCORS: true, backgroundColor: null, scrollY: 0 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    })
+    .from(wrapper)
+    .save();
+}
+
+loadForm('waiting');
+updateCounter('waiting');
+renderPreview('waiting');
+
+document.querySelectorAll('#waiting input[type="text"], #waiting textarea').forEach(input => {
+  input.addEventListener('input', () => saveForm('waiting'));
+});
+</script>
+</body>
+</html>

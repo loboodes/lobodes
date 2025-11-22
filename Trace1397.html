@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>متابعة الأنشطة</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+
+<style>
+@font-face {
+  font-family: 'HelveticaNeueW23-Regular';
+  src: url('fonts/HelveticaNeueW23-Regular.ttf') format('truetype');
+}
+
+body { 
+  font-family: 'HelveticaNeueW23-Regular', Arial, sans-serif; 
+  background-color: #f9f9f9;
+  margin:0; 
+  direction: rtl; 
+}
+
+/* الهيدر بهوية التقارير */
+header { 
+  background:#15445a; 
+  color:white; 
+  text-align:center; 
+  padding:10px; 
+  width:100%;
+  box-sizing:border-box;
+}
+header h3 { margin:3px 0; }
+
+/* التبويبات بهوية التقارير */
+.tabs {
+  display:flex;
+  justify-content:space-around;
+  margin-top:10px;
+  width:100%;
+  box-sizing:border-box;
+}
+.tab-btn {
+  flex:1;
+  text-align:center;
+  background:#37648c;
+  border:1px solid #305674;
+  padding:10px 0;
+  cursor:pointer;
+  font-weight:bold;
+  border-radius:5px 5px 0 0;
+  margin:0 2px;
+  color:white;
+}
+.tab-btn.active {
+  background:#0c8380;
+  color:white;
+}
+
+.tab-content {
+  display:none;
+  padding:15px;
+  border-radius:0 0 8px 8px;
+  background:#ffffff;
+  width:100%;
+  box-sizing:border-box;
+}
+.tab-content.active { display:block; }
+
+label {
+  font-weight:bold;
+  font-size:13px;
+  text-align:center;
+  display:block;
+  margin-bottom:2px;
+}
+input[type="text"] {
+  width:100%;
+  padding:4px;
+  border:1px solid #999;
+  border-radius:4px;
+  text-align:center;
+  font-size:12px;
+  box-sizing:border-box;
+  font-family: 'HelveticaNeueW23-Regular', Arial, sans-serif;
+}
+
+/* الجداول */
+.table-wrapper { overflow-x:auto; }
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  font-size:14px;
+  table-layout:auto;
+  min-width:600px;
+}
+th, td {
+  border:1px solid #999;
+  padding:5px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  text-align:center;
+  vertical-align:middle;
+}
+th {
+  background:#15445a;
+  color:white;
+}
+td input[type="text"] { 
+  width:100%; 
+  border:none; 
+  text-align:center; 
+  font-size:12px; 
+  box-sizing:border-box; 
+  font-family: 'HelveticaNeueW23-Regular', Arial, sans-serif;
+}
+
+input[type="radio"] {
+  transform:scale(1.2);
+  cursor:pointer;
+}
+
+/* الأزرار بهوية التقارير */
+button {
+  border:none;
+  padding:10px;
+  margin:10px 0;
+  cursor:pointer;
+  border-radius:6px;
+  font-size:14px;
+  font-weight:bold;
+  background:#0c8380;
+  color:white;
+  width:100%;
+  box-sizing:border-box;
+  font-family: 'HelveticaNeueW23-Regular', Arial, sans-serif;
+}
+
+/* تواقيع رائدة النشاط ومديرة المدرسة */
+.footer-fields {
+  display:flex;
+  justify-content:center;
+  gap:100px;
+  margin-top:20px;
+}
+.footer-fields div { text-align:center; }
+
+@media (max-width:768px){
+  table { min-width:600px; }
+}
+</style>
+</head>
+<body>
+
+<header><h3>متابعة الأنشطة</h3></header>
+
+<div class="tabs">
+  <div class="tab-btn active" onclick="openTab(event, 'classActivities')">متابعة الأنشطة الصفية</div>
+  <div class="tab-btn" onclick="openTab(event, 'nonClassActivities')">متابعة الأنشطة اللاصفية</div>
+</div>
+
+<!-- التبويب الأول: متابعة الأنشطة الصفية -->
+<div id="classActivities" class="tab-content active">
+
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px; margin-top:5px;">
+    <div><label>الفصل الدراسي</label><input type="text" /></div>
+    <div><label>الأسبوع</label><input type="text" /></div>
+    <div><label>التاريخ</label><input type="text" id="date1" placeholder="اختر التاريخ" readonly /></div>
+  </div>
+
+  <h4 style="text-align:center; background:#15445a; color:white; padding:6px; border-radius:4px;">
+    كشف متابعة حصص النشاط الأسبوعية
+  </h4>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:120px;">اسم المعلمة</th>
+          <th style="width:120px;">المجال</th>
+          <th style="width:80px;">اليوم</th>
+          <th style="width:400px;">الفعاليات والأنشطة</th>
+          <th style="width:30px;">نُفذ</th>
+          <th style="width:30px;">لم يُنفذ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <script>
+          for(let i=1;i<=15;i++){
+            document.write(`
+            <tr>
+              <td><input type="text"></td>
+              <td><input type="text"></td>
+              <td><input type="text" style="text-align:center;"></td>
+              <td><input type="text"></td>
+              <td><input type="radio" name="class_done_${i}"></td>
+              <td><input type="radio" name="class_done_${i}"></td>
+            </tr>`);
+          }
+        </script>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-fields">
+    <div><label>رائدة النشاط</label><input type="text"></div>
+    <div><label>مديرة المدرسة</label><input type="text"></div>
+  </div>
+
+  <button onclick="printPDF('classActivities')">طباعة التقرير</button>
+</div>
+
+<!-- التبويب الثاني: متابعة الأنشطة اللاصفية -->
+<div id="nonClassActivities" class="tab-content">
+
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px; margin-top:5px;">
+    <div><label>الفصل الدراسي</label><input type="text" /></div>
+    <div><label>الأسبوع</label><input type="text" /></div>
+    <div><label>التاريخ</label><input type="text" id="date2" placeholder="اختر التاريخ" readonly /></div>
+  </div>
+
+  <h4 style="text-align:center; background:#15445a; color:white; padding:6px; border-radius:4px;">
+    كشف متابعة الأنشطة اللاصفية الأسبوعية
+  </h4>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:120px;">اسم المعلمة</th>
+          <th style="width:120px;">المجال</th>
+          <th style="width:80px;">فترة التنفيذ</th>
+          <th style="width:80px;">اليوم</th>
+          <th style="width:300px;">الفعاليات والأنشطة</th>
+          <th style="width:30px;">نُفذ</th>
+          <th style="width:30px;">لم يُنفذ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <script>
+          for(let i=1;i<=15;i++){
+            document.write(`
+            <tr>
+              <td><input type="text"></td>
+              <td><input type="text"></td>
+              <td><input type="text"></td>
+              <td><input type="text" style="text-align:center;"></td>
+              <td><input type="text"></td>
+              <td><input type="radio" name="nonclass_done_${i}"></td>
+              <td><input type="radio" name="nonclass_done_${i}"></td>
+            </tr>`);
+          }
+        </script>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-fields">
+    <div><label>رائدة النشاط</label><input type="text"></div>
+    <div><label>مديرة المدرسة</label><input type="text"></div>
+  </div>
+
+  <button onclick="printPDF('nonClassActivities')">طباعة التقرير</button>
+</div>
+
+<script>
+// إعداد التاريخ بالهجري مع flatpickr
+document.addEventListener("DOMContentLoaded", function() {
+  const dateIds = ['date1', 'date2'];
+
+  dateIds.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      flatpickr(input, {
+        locale: 'ar',
+        disableMobile: true,
+        altInput: true,
+        altFormat: 'd-MM-yyyy هـ',
+        dateFormat: 'Y-m-d',
+        onChange: function(selectedDates, dateStr, instance) {
+          if (selectedDates.length > 0) {
+            const miladi = selectedDates[0];
+            miladi.setDate(miladi.getDate() - 1);
+            const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).format(miladi);
+            instance.altInput.value = hijri;
+          }
+        }
+      });
+    }
+  });
+});
+
+// تبديل التبويبات
+function openTab(evt, tabName){
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  evt.currentTarget.classList.add('active');
+}
+
+// طباعة إلى PDF بخلفية الهوية
+function printPDF(sectionId){
+  const element = document.getElementById(sectionId).cloneNode(true);
+  element.querySelectorAll("button").forEach(b => b.remove());
+
+  const wrapper = document.createElement('div');
+  wrapper.style.position = "relative";
+  wrapper.style.fontFamily = "'HelveticaNeueW23-Regular', Arial, sans-serif";
+  wrapper.style.boxSizing = "border-box";
+  wrapper.style.width = "210mm";
+  wrapper.style.height = "296.5mm";
+  wrapper.style.padding = "25mm 5mm 10mm 5mm"; 
+  wrapper.style.backgroundImage = "url('images/background.png')";
+  wrapper.style.backgroundSize = "cover";
+  wrapper.style.backgroundRepeat = "no-repeat";
+  wrapper.style.backgroundPosition = "center";
+
+  wrapper.appendChild(element);
+
+  html2pdf().set({
+    margin: 0,
+    filename: sectionId==='classActivities'
+      ? 'متابعة-الأنشطة-الصفية.pdf'
+      : 'متابعة-الأنشطة-اللاصفية.pdf',
+    image: { type:'jpeg', quality:0.98 },
+    html2canvas: { scale:2, backgroundColor:null, useCORS:true },
+    jsPDF: { unit:'mm', format:'a4', orientation:'portrait' }
+  }).from(wrapper).save();
+}
+</script>
+
+</body>
+</html>

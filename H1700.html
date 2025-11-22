@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تقرير التوجيه الصحي</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<style>
+@font-face {
+  font-family: 'HelveticaNeueW23';
+  src: url('fonts/HelveticaNeueW23-Regular.ttf') format('truetype');
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  background: #ffffff;
+}
+
+/* ✅ هذا هو الإطار اللي نطبعه (فيه الديباجة + التقرير كله) */
+#page {
+  padding: 10px;
+}
+
+/* الديباجة + عنوان التقرير */
+header {
+  text-align: center;
+  padding: 10px 0 5px;
+  background: #ffffff;
+  border-bottom: 3px solid #87092D;
+}
+header img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 5px;
+}
+header h3 {
+  margin: 3px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #87092D;
+}
+
+/* الحقول */
+label {
+  display: block;
+  margin: 5px 0 2px;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #c2c1c2;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+  font-size: 12px;
+  text-align: center;
+  background: transparent;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+}
+textarea {
+  min-height: 40px;
+}
+
+/* الأزرار (خارج المساحة المطبوعة) */
+button {
+  border: none;
+  padding: 8px 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  text-align: center;
+}
+button.printBtn {
+  background: #87092D;
+  color: white;
+}
+button.deleteBtn {
+  background: red;
+  color: white;
+}
+
+/* معاينة الصور */
+#health-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+.preview-item {
+  position: relative;
+  display: inline-block;
+}
+.preview-item img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.preview-item button {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  background: red;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ترتيب توقيعات أسفل التقرير */
+.sign-row {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 15px;
+}
+.sign-box {
+  text-align: center;
+}
+.sign-box input {
+  width: 200px;
+}
+</style>
+</head>
+<body>
+
+<div id="mainContent">
+
+  <!-- ✅ كل ما سيُطبع داخل هذا العنصر -->
+  <div id="page">
+
+    <!-- ✅ الديباجة (تطبع مع التقرير) -->
+    <header>
+      <!-- مهم: 26.png يجب أن تكون في نفس مجلد H1600.html -->
+      <img src="26.png" alt="شعار المدرسة السادسة والعشرون">
+      <h3>تقرير التوجيه الصحي</h3>
+    </header>
+
+    <div id="health" style="margin-top:10px;">
+
+      <!-- إدارة التعليم / اسم المدرسة -->
+      <div style="display:flex; gap:10px; justify-content:center; margin-bottom:8px;">
+        <div style="width:200px;">
+          <label>إدارة التعليم</label>
+          <input type="text" id="eduDept" />
+        </div>
+        <div style="width:200px;">
+          <label>اسم المدرسة</label>
+          <input type="text" id="schoolName" />
+        </div>
+      </div>
+
+      <!-- بيانات البرنامج الصحي -->
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px;">
+        <div>
+          <label>عنوان البرنامج الصحي</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>الفئة المستهدفة</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>مكان التنفيذ</label>
+          <input type="text" />
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px;">
+        <div>
+          <label>تاريخ التنفيذ</label>
+          <input type="text" id="date1" placeholder="اختر التاريخ" readonly />
+        </div>
+        <div>
+          <label>مدة التنفيذ</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>عدد المستفيدات</label>
+          <input type="text" />
+        </div>
+      </div>
+
+      <!-- أهداف البرنامج -->
+      <label style="margin-top:5px;">أهداف البرنامج</label>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px;">
+        <input type="text" /><input type="text" />
+        <input type="text" /><input type="text" />
+      </div>
+
+      <!-- محاور / أنشطة -->
+      <label style="margin-top:5px;">محاور / أنشطة البرنامج</label>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px;">
+        <input type="text" /><input type="text" />
+        <input type="text" /><input type="text" />
+      </div>
+
+      <!-- نتائج / ملاحظات -->
+      <label style="margin-top:5px;">نتائج وملاحظات</label>
+      <textarea></textarea>
+
+      <!-- الشواهد -->
+      <label style="margin-top:5px;">الشواهد (صور من التنفيذ)</label>
+      <input type="file" multiple accept="image/*" onchange="storeImages(event,'health')" />
+      <div id="health-counter" style="font-size:12px; color:#15445a; font-weight:bold;">عدد الصور المرفوعة: 0 / 4</div>
+      <div id="health-preview"></div>
+
+      <!-- الأسماء داخل التقرير (للطباعة في الأسفل) -->
+      <div class="sign-row" style="margin-top:10px;">
+        <div class="sign-box">
+          <label>منفذة البرنامج الصحي</label>
+          <input type="text" id="healthGuide" />
+        </div>
+        <div class="sign-box">
+          <label>مديرة المدرسة</label>
+          <input type="text" id="schoolDirector" />
+        </div>
+      </div>
+
+    </div> <!-- /health -->
+
+  </div> <!-- /page -->
+
+  <!-- ✅ الأزرار خارج المساحة المطبوعة -->
+  <div style="max-width:500px; margin:10px auto 20px;">
+    <button class="printBtn" onclick="printPDF()">طباعة التقرير</button>
+    <button class="deleteBtn" onclick="clearForm('health')">حذف البيانات</button>
+  </div>
+
+</div>
+
+<script>
+let uploadedImages = { health: [] };
+
+/* التقويم الهجري/الميلادي */
+document.addEventListener("DOMContentLoaded", function() {
+  const input = document.getElementById('date1');
+  if (input) {
+    flatpickr(input, {
+      locale: 'ar',
+      disableMobile: true,
+      altInput: true,
+      altFormat: 'd-MM-yyyy هـ',
+      dateFormat: 'Y-m-d',
+      onChange: function(selectedDates, dateStr, instance) {
+        if (selectedDates.length > 0) {
+          const miladi = selectedDates[0];
+          miladi.setDate(miladi.getDate() - 1);
+          const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          }).format(miladi);
+          instance.altInput.value = hijri;
+        }
+      }
+    });
+  }
+});
+
+/* حذف البيانات */
+function clearForm(tabId) {
+  const tab = document.getElementById(tabId);
+  if (!tab) return;
+  tab.querySelectorAll('input[type="text"],textarea').forEach(input => input.value = '');
+  uploadedImages[tabId] = [];
+  updateCounter(tabId);
+  renderPreview(tabId);
+}
+
+/* تخزين الصور */
+function storeImages(event, tabId) {
+  const files = event.target.files;
+  if (!uploadedImages[tabId]) uploadedImages[tabId] = [];
+
+  if (uploadedImages[tabId].length + files.length > 4) {
+    alert('مسموح برفع 4 صور فقط.');
+    event.target.value = '';
+    return;
+  }
+
+  for (let i = 0; i < files.length; i++) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      uploadedImages[tabId].push(e.target.result);
+      updateCounter(tabId);
+      renderPreview(tabId);
+    };
+    reader.readAsDataURL(files[i]);
+  }
+}
+
+/* عداد الصور */
+function updateCounter(tabId) {
+  const counter = document.getElementById(tabId + '-counter');
+  if (counter) {
+    const count = uploadedImages[tabId]?.length || 0;
+    counter.textContent = 'عدد الصور المرفوعة: ' + count + ' / 4';
+    counter.style.color = count >= 4 ? 'red' : '#15445a';
+  }
+}
+
+/* معاينة الصور */
+function renderPreview(tabId) {
+  const preview = document.getElementById(tabId + '-preview');
+  if (!preview) return;
+  preview.innerHTML = '';
+  (uploadedImages[tabId] || []).forEach((src, index) => {
+    const container = document.createElement('div');
+    container.className = 'preview-item';
+    const img = document.createElement('img');
+    img.src = src;
+    const btn = document.createElement('button');
+    btn.textContent = 'x';
+    btn.onclick = () => {
+      uploadedImages[tabId].splice(index, 1);
+      updateCounter(tabId);
+      renderPreview(tabId);
+    };
+    container.appendChild(img);
+    container.appendChild(btn);
+    preview.appendChild(container);
+  });
+}
+
+/* طباعة PDF: يأخذ كامل #page (فيه الديباجة + كل شيء) */
+function printPDF() {
+  const page = document.getElementById('page').cloneNode(true);
+
+  /* نضيف الصور المرفوعة في أسفل الصفحة داخل النسخة */
+  const tabId = 'health';
+  const tabImages = uploadedImages[tabId] || [];
+  if (tabImages.length > 0) {
+    const imagesWrapper = document.createElement('div');
+    imagesWrapper.style.display = 'flex';
+    imagesWrapper.style.flexWrap = 'wrap';
+    imagesWrapper.style.justifyContent = 'center';
+    imagesWrapper.style.marginTop = '10px';
+    imagesWrapper.style.gap = '10px';
+
+    tabImages.forEach(src => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.style.width = '140px';
+      img.style.height = '140px';
+      img.style.objectFit = 'cover';
+      img.style.border = '1px solid #ccc';
+      img.style.borderRadius = '4px';
+      imagesWrapper.appendChild(img);
+    });
+
+    page.appendChild(imagesWrapper);
+  }
+
+  /* تجهيز wrapper للطباعة (لو حابة تضيفي خلفية موحدة لكل التقارير) */
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'relative';
+  wrapper.style.width = '210mm';
+  wrapper.style.minHeight = '296.5mm';
+  wrapper.style.padding = '25mm 10mm 15mm 10mm';
+  wrapper.style.boxSizing = 'border-box';
+  /* لو عندك خلفية عامة للتقارير:
+     wrapper.style.backgroundImage = 'url("images/background.png")';
+     غيري المسار حسب ملفك */
+  wrapper.style.backgroundSize = 'cover';
+  wrapper.style.backgroundRepeat = 'no-repeat';
+  wrapper.style.backgroundPosition = 'center';
+  wrapper.appendChild(page);
+
+  html2pdf().set({
+    margin: 0,
+    filename: 'تقرير-التوجيه-الصحي.pdf',
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 3, useCORS: true, backgroundColor: null, scrollY: 0 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+  }).from(wrapper).save();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تقرير الدرس التطبيقي</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<style>
+@font-face {
+  font-family: 'HelveticaNeueW23';
+  src: url('fonts/HelveticaNeueW23-Regular.ttf') format('truetype');
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  background: #ffffff;
+}
+
+#mainContent { padding: 10px; }
+
+header {
+  background: #005741; /* أخضر من هوية التقارير */
+  color: white;
+  text-align: center;
+  padding: 10px;
+}
+header h3 {
+  margin: 3px 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+h3 label {
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+  display: block;
+  margin-bottom: 10px;
+}
+
+label {
+  display: block;
+  margin: 5px 0 2px;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #c2c1c2;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+  font-size: 12px;
+  text-align: center;
+  background: transparent;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+}
+
+textarea {
+  min-height: 40px;
+}
+
+button {
+  border: none;
+  padding: 8px 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  text-align: center;
+}
+
+button.printBtn {
+  background: #005741;
+  color: white;
+}
+button.deleteBtn {
+  background: red;
+  color: white;
+}
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  text-align:right;
+  margin-bottom:15px;
+}
+table td {
+  border:1px solid #999;
+  padding:2px;
+  height:20px;
+}
+table tr:nth-child(even) {
+  background:#f5f8f6;
+}
+
+#waiting-preview {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  justify-content:center;
+  margin-top:5px;
+}
+.preview-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.preview-image-wrapper img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 1px solid #999;
+  border-radius: 4px;
+}
+.remove-img-btn {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: red;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+}
+
+@media print {
+  body {
+    background: none !important;
+  }
+
+  input,
+  textarea,
+  label {
+    background: transparent !important;
+    color: black;
+    border-color: #c2c1c2;
+    margin-bottom: 14px !important;
+  }
+
+  button, #waiting-counter, #waiting-preview .remove-img-btn {
+    display: none !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="mainContent">
+  <header><h3>تقرير الدرس التطبيقي</h3></header>
+
+  <!-- نموذج البيانات -->
+  <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+    <div style="width:200px;"><label>إدارة التعليم</label><input type="text" /></div>
+    <div style="width:200px;"><label>اسم المدرسة</label><input type="text" /></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:10px;">
+    <div><label>المعلمة المنفذة</label><input type="text" /></div>
+    <div><label>الفصل الدراسي</label><input type="text" /></div>
+    <div><label>اليوم</label><input type="text" /></div>
+    <div><label>التاريخ</label><input type="text" id="date1" placeholder="اختر التاريخ" style="flex:1;" readonly /></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-bottom:10px;">
+    <div><label>المادة</label><input type="text" /></div>
+    <div><label>الوحدة الدراسية</label><input type="text" /></div>
+    <div><label>موضوع الدرس</label><input type="text" /></div>
+  </div>
+
+  <h4 style="text-align:center; margin:13px 0; background:#005741; color:white; padding:6px; border-radius:4px;">
+    الأهداف العامة
+  </h4>
+  <table>
+    <tr>
+      <td style="width:30px;text-align:center;">
+        <input type="text" value="١" style="width:100%;border:none;text-align:center;">
+      </td>
+      <td>
+        <input type="text" value="تطوير أساليب واستراتيجيات التدريس من خلال تبادل الخبرات والممارسات الناجحة بين المعلمات" style="width:100%;border:none;">
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:center;">
+        <input type="text" value="٢" style="width:100%;border:none;text-align:center;">
+      </td>
+      <td>
+        <input type="text" value="تفعيل استراتيجيات التعلم النشط والتقنيات الحديثة في التدريس" style="width:100%;border:none;">
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:center;">
+        <input type="text" value="٣" style="width:100%;border:none;text-align:center;">
+      </td>
+      <td>
+        <input type="text" value="تعزيز قدرة المعلمات على إدارة الصف بفاعلية وتحفيز الطالبات على المشاركة" style="width:100%;border:none;">
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:center;">
+        <input type="text" value="٤" style="width:100%;border:none;text-align:center;">
+      </td>
+      <td>
+        <input type="text" value="تنمية التعلم التشاركي بين المعلمات من خلال تبادل الأفكار والتغذية الراجعة" style="width:100%;border:none;">
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:center;">
+        <input type="text" value="٥" style="width:100%;border:none;text-align:center;">
+      </td>
+      <td>
+        <input type="text" value="تحفيز المعلمات على استخدام أساليب إبداعية ومبتكرة في تقديم الدروس" style="width:100%;border:none;">
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:center;">
+        <input type="text" value="٦" style="width:100%;border:none;text-align:center;">
+      </td>
+      <td>
+        <input type="text" value="تشجيع المعلمات على تقييم أدائهن التدريسي باستمرار والسعي لتطوير مهاراتهن" style="width:100%;border:none;">
+      </td>
+    </tr>
+  </table>
+
+  <!-- أسماء الحاضرات -->
+  <label>أسماء الحاضرات</label>
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; text-align: center;">
+    <div><label>اسم المعلمة</label></div><div><label>التخصص</label></div>
+    <div><input type="text"></div><div><input type="text"></div>
+    <div><input type="text"></div><div><input type="text"></div>
+    <div><input type="text"></div><div><input type="text"></div>
+    <div><input type="text"></div><div><input type="text"></div>
+  </div>
+
+  <!-- الشواهد -->
+  <label>الشواهد (صور)</label>
+  <input type="file" multiple accept="image/*" onchange="storeImages(event,'waiting')" />
+  <div id="waiting-counter" style="font-size:12px; color:#15445a; font-weight:bold;">عدد الصور المرفوعة: 0 / 4</div>
+  <div id="waiting-preview"></div>
+
+  <!-- مديرة المدرسة -->
+  <div id="directorField" style="display:flex; justify-content:center; margin-top:10px;">
+    <div style="width:200px;">
+      <label>مديرة المدرسة</label>
+      <input type="text" id="directorName" />
+    </div>
+  </div>
+
+  <!-- الأزرار -->
+  <button class="printBtn" onclick="printPDF('mainContent',this)">طباعة التقرير</button>
+</div>
+
+<script>
+let uploadedImages = {};
+
+// تقويم هجري مع عرض التاريخ الهجري في الحقل
+document.addEventListener("DOMContentLoaded", function() {
+  const input = document.getElementById('date1');
+  if (input) {
+    flatpickr(input, {
+      locale: 'ar',
+      disableMobile: true,
+      altInput: true,
+      altFormat: 'd-MM-yyyy هـ',
+      dateFormat: 'Y-m-d',
+      onChange: function(selectedDates, dateStr, instance) {
+        if (selectedDates.length > 0) {
+          const miladi = selectedDates[0];
+          miladi.setDate(miladi.getDate() - 1); // إنقاص يوم كما في بقية النماذج
+          const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          }).format(miladi);
+          instance.altInput.value = hijri;
+        }
+      }
+    });
+  }
+});
+
+function storeImages(event, sectionId){
+  const files = Array.from(event.target.files);
+  if (!uploadedImages[sectionId]) uploadedImages[sectionId] = [];
+
+  if (uploadedImages[sectionId].length + files.length > 4) {
+    alert('مسموح برفع 4 صور فقط.');
+    event.target.value = '';
+    return;
+  }
+
+  const preview = document.getElementById(sectionId + '-preview');
+
+  files.forEach((file) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'preview-image-wrapper';
+    const img = document.createElement('img');
+    const reader = new FileReader();
+    reader.onload = function(e){ img.src = e.target.result; };
+    reader.readAsDataURL(file);
+
+    const removeBtn = document.createElement('div');
+    removeBtn.className = 'remove-img-btn';
+    removeBtn.innerText = '×';
+    removeBtn.onclick = () => {
+      const idx = uploadedImages[sectionId].indexOf(file);
+      if (idx > -1) uploadedImages[sectionId].splice(idx, 1);
+      wrapper.remove();
+      document.getElementById(sectionId+'-counter').innerText =
+        'عدد الصور المرفوعة: ' + uploadedImages[sectionId].length + ' / 4';
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(removeBtn);
+    preview.appendChild(wrapper);
+    uploadedImages[sectionId].push(file);
+  });
+
+  document.getElementById(sectionId+'-counter').innerText =
+    'عدد الصور المرفوعة: ' + uploadedImages[sectionId].length + ' / 4';
+}
+
+function printPDF(sectionId, btn){
+  btn.style.display = "none";
+
+  const element = document.getElementById(sectionId).cloneNode(true);
+  element.querySelectorAll('button,input[type="file"],#waiting-counter,#waiting-preview .remove-img-btn')
+    .forEach(el => el.remove());
+
+  // استبدال صور المعاينة بنسخة أكبر في نفس مكانها
+  const preview = element.querySelector('#waiting-preview');
+  if (preview) {
+    preview.innerHTML = '';
+    const originalFiles = uploadedImages['waiting'] || [];
+    if (originalFiles.length > 0) {
+      const imagesWrapper = document.createElement('div');
+      imagesWrapper.style.display = 'flex';
+      imagesWrapper.style.flexWrap = 'wrap';
+      imagesWrapper.style.justifyContent = 'center';
+      imagesWrapper.style.marginTop = '10px';
+      imagesWrapper.style.gap = '8px';
+
+      originalFiles.forEach(file => {
+        const img = document.createElement('img');
+        img.style.width = '140px';
+        img.style.height = '130px';
+        img.style.objectFit = 'cover';
+        img.style.border = '1px solid #999';
+        img.style.borderRadius = '4px';
+        const reader = new FileReader();
+        reader.onload = e => { img.src = e.target.result; };
+        reader.readAsDataURL(file);
+        imagesWrapper.appendChild(img);
+      });
+
+      preview.appendChild(imagesWrapper);
+    }
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'relative';
+  wrapper.style.width = '210mm';
+  wrapper.style.height = '296.5mm';
+  wrapper.style.padding = '35mm 10mm 10mm 10mm';
+  wrapper.style.boxSizing = 'border-box';
+  wrapper.style.backgroundImage = 'url("images/background.png")';
+  wrapper.style.backgroundSize = 'cover';
+  wrapper.style.backgroundRepeat = 'no-repeat';
+  wrapper.style.backgroundPosition = 'center';
+  wrapper.appendChild(element);
+
+  html2pdf().set({
+    margin: 0,
+    filename:'تقرير-الدرس-التطبيقي.pdf',
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:2,backgroundColor:null,useCORS:true,scrollY:0},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+  }).from(wrapper).save().then(() => {
+    btn.style.display = "block";
+  });
+}
+</script>
+</body>
+</html>

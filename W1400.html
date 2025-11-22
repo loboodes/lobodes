@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تقرير جلسات مجتمعات التعلّم المهنية</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+  <style>
+    @font-face {
+      font-family: 'HelveticaNeueW23';
+      src: url('fonts/HelveticaNeueW23-Regular.ttf') format('truetype');
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'HelveticaNeueW23', sans-serif;
+      background: #f0f0f0;
+    }
+    header {
+      background: #087558;
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+    }
+    header h2 { margin: 0; font-size: 18px; font-weight: bold; }
+    .container {
+      max-width: 1200px;
+      width: 95%;
+      margin: 10px auto;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    label {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 3px;
+      display: block;
+      font-size: 12px;
+    }
+    input {
+      width: 100%;
+      height: 30px;
+      padding: 0;
+      border: 1px solid #666;
+      border-radius: 4px;
+      text-align: center;
+      font-family: 'HelveticaNeueW23', sans-serif;
+      font-size: 11px;
+    }
+    input[type="radio"] {
+      width: 14px;
+      height: 14px;
+      transform: scale(0.8);
+      margin: 0 auto;
+      display: block;
+    }
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    button {
+      background: #087558;
+      color: #fff;
+      border: none;
+      padding: 8px 0;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      width: 100%;
+      font-family: 'HelveticaNeueW23', sans-serif;
+    }
+    button.deleteBtn { background: red; }
+    button:hover { background: #065f46; }
+    #images-preview img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<header><h2>تقرير جلسات مجتمعات التعلّم المهنية</h2></header>
+
+<div class="container" id="formContent">
+
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-bottom:5px;">
+    <div><label>الفصل الدراسي</label><input type="text" id="term"></div>
+    <div><label>موضوع الوحدة</label><input type="text" id="unitTopic"></div>
+    <div><label>أدوات التطوير المهني</label><input type="text" id="devTools"></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:5px;">
+    <div><label>اليوم</label><input type="text" id="day"></div>
+    <div><label>التاريخ</label><input type="text" id="date1" placeholder="اختر التاريخ" style="flex:1;" readonly /></div>
+    <div><label>مكان التنفيذ</label><input type="text" id="place"></div>
+    <div><label>عدد الحضور</label><input type="text" id="attendanceCount"></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-bottom:5px;">
+    <div><label>الفئة المستهدفة</label><input type="text" id="targetGroup"></div>
+    <div><label>الجلسة القادمة اليوم</label><input type="text" id="nextDay"></div>
+    <div><label>الجلسة القادمة التاريخ</label><input type="text" id="date2" placeholder="اختر التاريخ" style="flex:1;" readonly /></div>
+  </div>
+
+  <label>أهداف الجلسة</label>
+  <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px; margin-bottom:10px;">
+    <input type="text"><input type="text">
+    <input type="text"><input type="text">
+    <input type="text"><input type="text">
+  </div>
+
+  <label>نتائج الجلسة</label>
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-bottom:10px;">
+    <input type="text"><input type="text"><input type="text">
+    <input type="text"><input type="text"><input type="text">
+  </div>
+
+  <label>أسماء الحاضرات</label>
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:15px;">
+    <input type="text"><input type="text"><input type="text"><input type="text">
+    <input type="text"><input type="text"><input type="text"><input type="text">
+  </div>
+
+  <label>الشواهد (صور)</label>
+  <input type="file" multiple accept="image/*" onchange="storeImages(event)" />
+  <div id="images-counter" style="font-size:12px; color:#15445a; font-weight:bold;">عدد الصور المرفوعة: 0 / 4</div>
+  <div id="images-preview" style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px; margin-bottom:10px;"></div>
+
+  <div style="display:flex; gap:10px; justify-content:center; margin-top:10px; margin-bottom:10px;">
+    <div style="width:200px;"><label>المعلمة المنفذة</label><input type="text" id="teacherName"></div>
+    <div style="width:200px;"><label>مديرة المدرسة</label><input type="text" id="principalName"></div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="downloadPDF()">تحميل PDF</button>
+    <button class="deleteBtn" onclick="clearFields()">حذف البيانات</button>
+  </div>
+
+</div>
+
+<script>
+let uploadedImages = [];
+
+document.addEventListener("DOMContentLoaded", function() {
+  const dateIds = ['date1', 'date2'];
+
+  dateIds.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      flatpickr(input, {
+        locale: 'ar',
+        disableMobile: true,
+        altInput: true,
+        altFormat: 'd-MM-yyyy هـ',
+        dateFormat: 'Y-m-d',
+        onChange: function(selectedDates, dateStr, instance) {
+          if (selectedDates.length > 0) {
+            const miladi = selectedDates[0];
+            miladi.setDate(miladi.getDate() - 1);
+
+            const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).format(miladi);
+            instance.altInput.value = hijri;
+          }
+        }
+      });
+    }
+  });
+
+  ["teacherName","principalName"].forEach(id=>{
+    if(localStorage.getItem(id)) {
+      const el = document.getElementById(id);
+      if (el) el.value = localStorage.getItem(id);
+    }
+  });
+
+  updateCounter();
+  renderPreview();
+});
+
+document.querySelectorAll('input').forEach(input => {
+  if (input.id) {
+    input.addEventListener('input',()=>localStorage.setItem(input.id,input.value));
+  }
+});
+
+function storeImages(event){
+  const files = event.target.files;
+  if(uploadedImages.length + files.length > 4){
+    alert('مسموح برفع 4 صور فقط.');
+    event.target.value='';
+    return;
+  }
+  for(let i=0;i<files.length;i++){
+    const reader = new FileReader();
+    reader.onload = e=>{
+      uploadedImages.push(e.target.result);
+      updateCounter();
+      renderPreview();
+    };
+    reader.readAsDataURL(files[i]);
+  }
+}
+
+function updateCounter(){
+  const count = uploadedImages.length;
+  const counter = document.getElementById("images-counter");
+  counter.textContent = `عدد الصور المرفوعة: ${count} / 4`;
+  counter.style.color = count>=4 ? 'red' : '#15445a';
+}
+
+function renderPreview(){
+  const preview = document.getElementById("images-preview");
+  preview.innerHTML = '';
+  uploadedImages.forEach((src,index)=>{
+    const container = document.createElement('div');
+    container.style.position='relative';
+    const img=document.createElement('img');
+    img.src=src;
+    const btn=document.createElement('button');
+    btn.textContent='x';
+    btn.style.position='absolute';
+    btn.style.top='2px';
+    btn.style.left='50%';
+    btn.style.transform='translateX(-50%)';
+    btn.style.width='18px';
+    btn.style.height='18px';
+    btn.style.fontSize='10px';
+    btn.style.background='red';
+    btn.style.color='white';
+    btn.style.border='2px solid white';
+    btn.style.borderRadius='50%';
+    btn.onclick=()=>{ uploadedImages.splice(index,1); updateCounter(); renderPreview(); };
+    container.appendChild(img);
+    container.appendChild(btn);
+    preview.appendChild(container);
+  });
+}
+
+function downloadPDF(){
+  const content = document.getElementById("formContent").cloneNode(true);
+  content.querySelectorAll("button,input[type='file'],#images-counter,#images-preview").forEach(el=>el.remove());
+
+  const labelShawahid = Array.from(content.querySelectorAll('label'))
+      .find(lbl => lbl.textContent.includes('الشواهد'));
+
+  if(uploadedImages.length>0 && labelShawahid){
+    const imagesWrapper = document.createElement('div');
+    imagesWrapper.style.display='flex';
+    imagesWrapper.style.justifyContent='center';
+    imagesWrapper.style.flexWrap='wrap';
+    imagesWrapper.style.gap='5px';
+    imagesWrapper.style.margin='5px 0 10px 0';
+
+    uploadedImages.forEach(src=>{
+      const img=document.createElement('img');
+      img.src=src;
+      img.style.width='160px';
+      img.style.height='200px';
+      img.style.objectFit='cover';
+      imagesWrapper.appendChild(img);
+    });
+
+    labelShawahid.parentNode.insertBefore(imagesWrapper,labelShawahid.nextSibling);
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.style.position="relative";
+  wrapper.style.width="210mm";
+  wrapper.style.minHeight="296.5mm";
+  wrapper.style.padding="35mm 10mm 10mm 10mm";
+  wrapper.style.boxSizing="border-box";
+  wrapper.style.backgroundImage='url("images/background.png")';
+  wrapper.style.backgroundSize="cover";
+  wrapper.style.backgroundRepeat="no-repeat";
+  wrapper.style.backgroundPosition="center";
+
+  wrapper.appendChild(content);
+
+  html2pdf().from(wrapper).set({
+      margin:0,
+      filename:'تقرير جلسات مجتمعات التعلّم المهنية.pdf',
+      html2canvas:{scale:3,useCORS:true,backgroundColor:null},
+      jsPDF:{orientation:'portrait',unit:'mm',format:'a4'}
+  }).save();
+}
+
+function clearFields(){
+  document.querySelectorAll('input').forEach(i=>i.value='');
+  ["teacherName","principalName"].forEach(id=>localStorage.removeItem(id));
+  uploadedImages=[];
+  updateCounter();
+  renderPreview();
+}
+</script>
+
+</body>
+</html>

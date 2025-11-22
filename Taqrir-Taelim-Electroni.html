@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  background-color: white; /* خلفية الصفحة ويب */
+}
+
+@font-face {
+  font-family: 'HelveticaNeueW23';
+  src: url('fonts/HelveticaNeueW23-Regular.ttf') format('truetype');
+}
+
+header {
+  background-color: #1CA6A6;
+  color: white;
+  text-align: center;
+  padding: 15px 0;
+  font-weight: bold;
+  font-size: 18px;
+  border-bottom: 3px solid #128080;
+}
+
+@media print {
+  header { display: none; }
+  table tr:nth-child(even) { background-color: transparent !important; }
+  table tr, table td, table th { background-color: transparent !important; }
+  body { 
+    margin-top: 20mm;
+    margin-left: 5mm;
+    margin-right: 5mm;
+    margin-bottom: 5mm;
+  }
+}
+
+#mainContent { padding: 9px; }
+
+label { display: block; margin: 5px 0 2px; font-weight: bold; font-size: 9px; text-align: center; }
+input, textarea {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #c2c1c2;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+  font-size: 9px;
+  text-align: center;
+  background: transparent;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+}
+textarea { min-height: 40px; }
+button {
+  border: none;
+  padding: 8px 9px;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  text-align: center;
+}
+button.printBtn { background: #555; color: white; }
+button.deleteBtn { background: red; color: white; }
+
+table { width:100%; border-collapse:collapse; font-size:9px; text-align:center; margin-bottom:15px; }
+table td, table th { border:1px solid #999; padding:4px; height:30px; }
+table tr:nth-child(even) { background:#f2f2f2; }
+
+#waiting-preview {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  justify-content:center;
+  margin-top:5px;
+}
+.preview-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.preview-image-wrapper img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 1px solid #999;
+  border-radius: 4px;
+}
+.remove-img-btn {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: red;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.radio-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+}
+.radio-wrapper span {
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<header>تقرير تنفيذ التعليم الإلكتروني</header>
+
+<div id="mainContent">
+
+  <!-- بيانات أساسية -->
+  <div style="display:flex; gap:9px; justify-content:center; margin-bottom:9px;">
+    <div style="width:200px;"><label>إدارة التعليم</label><input type="text" /></div>
+    <div style="width:200px;"><label>اسم المدرسة</label><input type="text" /></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px; justify-content:center; margin-bottom:9px;">
+    <div><label>الفصل الدراسي</label><input type="text" /></div>
+    <div><label>مدة التنفيذ</label><input type="text" /></div>
+    <div><label>التاريخ من</label><input type="text" id="date1" placeholder="اختر التاريخ" style="flex:1;" readonly />
+</div>
+    <div><label>التاريخ إلى</label><input type="text" id="date2" placeholder="اختر التاريخ" style="flex:1;" readonly />
+</div>
+  </div>
+
+  <div style="display:flex; gap:9px; justify-content:center; margin-bottom:9px;">
+   
+    <div style="flex:1;"><label>العمل المنفذ</label><input type="text" /></div>
+    <div style="flex:1;">
+    <label>الفئة المستهدفة</label>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+      <input type="text" />
+      <input type="text" />
+      <input type="text" />
+    </div>
+    </div>
+  </div>
+
+  <!-- التقنية المستخدمة -->
+  <table>
+    <tr>
+      <th>التقنية المستخدمة</th>
+      <th>جهاز العرض</th>
+      <th>جهاز الكمبيوتر</th>
+      <th>الشاشة الذكية</th>
+      <th>جهاز الحاسب</th>
+      <th>الجهاز اللوحي</th>
+      <th>جهاز الجوال</th>
+      <th>أخرى</th>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; text-align:center;">✓</td>
+      <td><input type="checkbox"></td>
+      <td><input type="checkbox"></td>
+      <td><input type="checkbox"></td>
+      <td><input type="checkbox"></td>
+      <td><input type="checkbox"></td>
+      <td><input type="checkbox"></td>
+      <td><input type="text"></td>
+    </tr>
+  </table>
+
+  <!-- نوع التفعيل الإلكتروني -->
+   <h6 style="text-align:center; margin:11px 0; background:#1CA6A6; color:white; padding:6px; border-radius:4px;">التفعيل الإلكتروني المستخدم</h6>
+ 
+   <table>
+    <tr>
+      <th>اسم المنصة</th>
+      <th>اسم القناة </th>
+      <th>اسم البرنامج الإلكتروني</th>
+         <th>اسم التطبيق</th>
+
+      <th>أخرى</th>
+    </tr>
+    <tr>
+      <td><input type="text"></td>
+      <td><input type="text"></td>
+      <td><input type="text"></td>
+      <td><input type="text"></td>
+          <td><input type="text"></td>
+
+    </tr>
+  </table>
+<!-- أسماء المنفذات -->
+  <h6 style="text-align:center; margin:11px 0; background:#1CA6A6; color:white; padding:6px; border-radius:4px;">أسماء المنفذات للبرنامج </h6>
+  <table>
+    <tr>
+      <th>الاسم</th>
+      <th>الوظيفة</th>
+      <th>الاسم</th>
+      <th>الوظيفة</th>
+    </tr>
+    <tr>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
+    </tr>
+    <tr>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
+    </tr>
+  </table>
+  <!-- أهداف البرنامج -->
+  <h6 style="text-align:center; margin:11px 0; background:#1CA6A6; color:white; padding:6px; border-radius:4px;">أهداف البرنامج</h6>
+  <table>
+    <tr>
+      <td><input type="text"></td>
+      <td><input type="text"></td>
+    </tr>
+  </table>
+ 
+  <!-- الأثر الإيجابي -->
+  <h6 style="text-align:center; margin:11px 0; background:#1CA6A6; color:white; padding:6px; border-radius:4px;">الأثر الإيجابي للبرنامج</h6>
+  <table>
+    <tr>
+      <td><input type="text"></td>
+      <td><input type="text"></td>
+    </tr>
+  </table>
+
+  <!-- رفع الصور -->
+  <input type="file" multiple accept="image/*" onchange="storeImages(event,'waiting')" />
+  <div id="waiting-counter" style="font-size:9px; color:#15445a; font-weight:bold;">عدد الصور المرفوعة: 0 / 4</div>
+  <div id="waiting-preview"></div>
+
+  <!-- توقيعات -->
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:9px;">
+    <div><label>أمينة مصادر التعلم</label><input type="text"></div>
+    <div><label>مشرفة الدعم المدرسي</label><input type="text"></div>
+    <div><label>مديرة المدرسة</label><input type="text"></div>
+  </div>
+
+  <button class="printBtn" onclick="printPDF('mainContent',this)">طباعة التقرير</button>
+</div>
+
+<script>
+let uploadedImages = {};
+document.addEventListener("DOMContentLoaded", function() {
+  const dateIds = ['date1', 'date2']; // ضع أسماء المعرفات هنا
+
+  dateIds.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      flatpickr(input, {
+        locale: 'ar',
+        disableMobile: true,
+        altInput: true,
+        altFormat: 'd-MM-yyyy هـ',
+        dateFormat: 'Y-m-d',
+        onChange: function(selectedDates, dateStr, instance) {
+          if (selectedDates.length > 0) {
+            const miladi = selectedDates[0];
+             miladi.setDate(miladi.getDate() - 1);
+
+            const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).format(miladi);
+            instance.altInput.value = hijri;
+          }
+        }
+      });
+    }
+  });
+});
+
+
+const today = new Date();
+const day = String(today.getDate()).padStart(2,'0');
+const month = String(today.getMonth()+1).padStart(2,'0');
+const year = today.getFullYear();
+document.getElementById('waitingDate').value = `${day}-${month}-${year}`;
+flatpickr('#waitingDate',{locale:'ar',dateFormat:'d-m-Y',altInput:true,altFormat:'d-m-Y'});
+flatpickr('#waitingDateTo',{locale:'ar',dateFormat:'d-m-Y',altInput:true,altFormat:'d-m-Y'});
+
+function storeImages(event, sectionId){
+  const files = Array.from(event.target.files);
+  const preview = document.getElementById(sectionId+'-preview');
+
+  if (!uploadedImages[sectionId]) uploadedImages[sectionId] = [];
+
+  const availableSlots = 4 - uploadedImages[sectionId].length;
+  if (files.length > availableSlots) {
+    alert(`يمكنك رفع ${availableSlots} صورة فقط.`);
+  }
+
+  const filesToAdd = files.slice(0, availableSlots);
+  filesToAdd.forEach(file => {
+    uploadedImages[sectionId].push(file);
+
+    const wrapper=document.createElement('div');
+    wrapper.className='preview-image-wrapper';
+
+    const img=document.createElement('img');
+    const reader=new FileReader();
+    reader.onload=function(e){ img.src=e.target.result; }
+    reader.readAsDataURL(file);
+
+    const removeBtn=document.createElement('div');
+    removeBtn.className='remove-img-btn';
+    removeBtn.innerText='×';
+    removeBtn.onclick=()=>{ 
+      wrapper.remove(); 
+      uploadedImages[sectionId] = uploadedImages[sectionId].filter(f => f !== file);
+      document.getElementById(sectionId+'-counter').innerText=`عدد الصور المرفوعة: ${uploadedImages[sectionId].length} / 4`;
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(removeBtn);
+    preview.appendChild(wrapper);
+  });
+
+  document.getElementById(sectionId+'-counter').innerText=`عدد الصور المرفوعة: ${uploadedImages[sectionId].length} / 4`;
+}
+
+function printPDF(sectionId,btn){
+  btn.style.display="none";
+  const element=document.getElementById(sectionId).cloneNode(true);
+  element.querySelectorAll('button,input[type="file"],#waiting-counter,#waiting-preview .remove-img-btn').forEach(el=>el.remove());
+
+  const images = element.querySelectorAll('#waiting-preview img');
+  images.forEach(img => {
+    img.style.width = '165px';
+    img.style.height = '105px';
+    img.style.objectFit = 'cover';
+  });
+
+  const wrapper=document.createElement('div');
+  wrapper.style.position='relative';
+  wrapper.style.width='210mm';
+  wrapper.style.height='296.5mm';
+  wrapper.style.padding='20mm 10mm 20mm 10mm';
+  wrapper.style.boxSizing='border-box';
+  wrapper.style.backgroundImage='url("images/background.png")'; // خلفية PDF
+  wrapper.style.backgroundSize='cover';
+  wrapper.style.backgroundRepeat='no-repeat';
+  wrapper.style.backgroundPosition='center';
+  wrapper.appendChild(element);
+
+  html2pdf().set({
+    margin: 0,
+    filename:'تقرير-تعليم-الكتروني.pdf',
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:2,backgroundColor:null,useCORS:true},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+  }).from(wrapper).save().then(()=>{ btn.style.display="block"; });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  background: #ffffff;
+}
+@font-face {
+  font-family: 'HelveticaNeueW23';
+  src: url('fonts/HelveticaNeueW23-Regular.ttf') format('truetype');
+}
+#mainContent { padding: 10px; }
+
+header { background: #0A54A9; color: white; text-align: center; padding: 10px; }
+header h3 { margin: 3px 0; font-size: 16px; }
+header h3 label { font-weight: bold; font-size: 18px; text-align: center; display: block; }
+
+label { display: block; margin: 5px 0 2px; font-weight: bold; font-size: 12px; text-align: center; }
+input, textarea { width: 100%; padding: 4px; border: 1px solid #c2c1c2; border-radius: 4px; margin-bottom: 5px; box-sizing: border-box; font-size: 12px; text-align: center; background: transparent; font-family: 'HelveticaNeueW23', Arial, sans-serif; }
+textarea { min-height: 40px; }
+
+button {
+  border: none;
+  padding: 8px 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'HelveticaNeueW23', Arial, sans-serif;
+  text-align: center;
+}
+button.printBtn { background: #555; color: white; }
+
+table { width:100%; border-collapse:collapse; font-size:12px; text-align:right; margin-bottom:15px; }
+table td, table th { border:1px solid #999; padding:2px; height:20px; }
+table tr:nth-child(even) { background:#f2f2f2; }
+
+/* محاذاة الأرقام للوسط */
+table td:first-child, table td:nth-child(3) { text-align:center; font-weight:bold; }
+
+.tabs { display:flex; gap:5px; margin-bottom:10px; cursor:pointer; }
+.tab { padding:10px; border-radius:4px 4px 0 0; font-weight:bold; text-align:center; flex:1; }
+.tab.active { color:white; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+#tab1 { background:#1E8449; color:white; }
+#tab2 { background:#C0392B; color:white; }
+
+.preview-image-wrapper { position: relative; display: inline-block; margin:2px; }
+.preview-image-wrapper img { width: 100px; height: 100px; object-fit: cover; border:1px solid #999; border-radius:4px; }
+.remove-img-btn { position: absolute; top: -6px; left: -6px; width: 20px; height: 20px; border-radius: 50%; background: red; color:white; font-weight:bold; font-size:14px; line-height:18px; text-align:center; cursor:pointer; }
+
+/* توسيط الصور عند الطباعة */
+.print-image-wrapper { display:flex; justify-content:center; flex-wrap:wrap; gap:5px; margin-top:5px; }
+.print-image-wrapper img { margin:5px; object-fit:cover; }
+</style>
+</head>
+
+<body>
+<div id="mainContent">
+  <header><h3><label>تقرير الخطة الإثرائية و العلاجية</label></h3></header>
+
+  <div class="tabs">
+    <div class="tab active" data-target="content1" id="tab1">الخطة الإثرائية</div>
+    <div class="tab" data-target="content2" id="tab2">الخطة العلاجية</div>
+  </div>
+
+  <!-- تبويب 1 -->
+  <div class="tab-content active" id="content1">
+    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+      <div style="width:200px;"><label>إدارة التعليم</label><input type="text" /></div>
+      <div style="width:200px;"><label>اسم المدرسة</label><input type="text" /></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:10px;">
+      <div><label>الفصل الدراسي</label><input type="text" /></div>
+      <div><label>المادة</label><input type="text" /></div>
+      <div><label>اليوم</label><input type="text" /></div>
+      <div><label>التاريخ</label><input type="text" id="date1" placeholder="اختر التاريخ" style="flex:1;" readonly />
+</div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px; margin-bottom:10px;">
+      <div><label>اسم الطالبة</label><input type="text" /></div>
+      <div><label>الصف الدراسي</label><input type="text" /></div>
+    </div>
+
+    <!-- الجداول -->
+    <h4 style="text-align:center; margin:10px 0; background:#1E8449; color:white; padding:6px; border-radius:4px;">أهداف الخطة الإثرائية</h4>
+    <table>
+      <tr><td>1</td><td><input type="text"></td><td>2</td><td><input type="text"></td></tr>
+      <tr><td>3</td><td><input type="text"></td><td>4</td><td><input type="text"></td></tr>
+    </table>
+
+    <h4 style="text-align:center; margin:10px 0; background:#1E8449; color:white; padding:6px; border-radius:4px;">جوانب التميز لدى الطالبة</h4>
+    <table>
+      <tr><td>1</td><td><input type="text"></td><td>2</td><td><input type="text"></td></tr>
+      <tr><td>3</td><td><input type="text"></td><td>4</td><td><input type="text"></td></tr>
+    </table>
+
+    <h4 style="text-align:center; margin:10px 0; background:#1E8449; color:white; padding:6px; border-radius:4px;">أساليب التحفيز للطالبة</h4>
+    <table>
+      <tr><td>1</td><td><input type="text"></td><td>2</td><td><input type="text"></td></tr>
+      <tr><td>3</td><td><input type="text"></td><td>4</td><td><input type="text"></td></tr>
+    </table>
+
+    <h4 style="text-align:center; margin:10px 0; background:#1E8449; color:white; padding:6px; border-radius:4px;">المكافآت</h4>
+    <table>
+      <tr>
+        <td style="text-align:center;">1</td>
+        <td><input type="text" style="width:100%;border:none;text-align:center;"></td>
+        <td style="text-align:center;">2</td>
+        <td><input type="text" style="width:100%;border:none;text-align:center;"></td>
+      </tr>
+    </table>
+
+    <!-- رفع الصور -->
+    <input type="file" multiple accept="image/*" onchange="storeImages(event,'enrichment')" />
+    <div id="enrichment-counter" style="font-size:12px; color:#15445a; font-weight:bold;">عدد الصور المرفوعة: 0 / 4</div>
+    <div id="enrichment-preview"></div>
+
+    <div style="display:flex; justify-content:center; gap:30px; margin-top:10px;" id="directorField">
+      <div style="width:200px;">
+        <label>اسم المعلمة</label><input type="text" />
+      </div>
+      <div style="width:200px;">
+        <label>مديرة المدرسة</label><input type="text" id="directorName"/>
+      </div>
+    </div>
+
+    <button class="printBtn" onclick="printPDF('content1')">طباعة الخطة الإثرائية</button>
+  </div>
+
+  <!-- تبويب 2 -->
+  <div class="tab-content" id="content2">
+    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+      <div style="width:200px;"><label>إدارة التعليم</label><input type="text" /></div>
+      <div style="width:200px;"><label>اسم المدرسة</label><input type="text" /></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:10px;">
+      <div><label>الفصل الدراسي</label><input type="text" /></div>
+      <div><label>المادة</label><input type="text" /></div>
+      <div><label>اليوم</label><input type="text" /></div>
+      <div><label>التاريخ</label><input type="text" id="date2" placeholder="اختر التاريخ" style="flex:1;" readonly />
+</div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px; margin-bottom:10px;">
+      <div><label>اسم الطالبة</label><input type="text" /></div>
+      <div><label>الصف الدراسي</label><input type="text" /></div>
+    </div>
+
+    <h4 style="text-align:center; margin:10px 0; background:#C0392B; color:white; padding:6px; border-radius:4px;">أهداف الخطة العلاجية</h4>
+    <table>
+      <tr><td>1</td><td><input type="text"></td><td>2</td><td><input type="text"></td></tr>
+      <tr><td>3</td><td><input type="text"></td><td>4</td><td><input type="text"></td></tr>
+    </table>
+
+    <h4 style="text-align:center; margin:10px 0; background:#C0392B; color:white; padding:6px; border-radius:4px;">جوانب الإخفاق لدى الطالبة</h4>
+    <table>
+      <tr><td>1</td><td><input type="text"></td><td>2</td><td><input type="text"></td></tr>
+      <tr><td>3</td><td><input type="text"></td><td>4</td><td><input type="text"></td></tr>
+    </table>
+
+    <h4 style="text-align:center; margin:10px 0; background:#C0392B; color:white; padding:6px; border-radius:4px;">الأساليب العلاجية للطالبة</h4>
+    <table>
+      <tr><td>1</td><td><input type="text"></td><td>2</td><td><input type="text"></td></tr>
+      <tr><td>3</td><td><input type="text"></td><td>4</td><td><input type="text"></td></tr>
+    </table>
+      <h4 style="text-align:center; margin:10px 0; background:#C0392B; color:white; padding:6px; border-radius:4px;">الإجراءات و المهام التكليفية</h4>
+    <table>
+      <tr>
+        <td style="text-align:center;">1</td>
+        <td><input type="text" style="width:100%;border:none;text-align:center;"></td>
+        <td style="text-align:center;">2</td>
+        <td><input type="text" style="width:100%;border:none;text-align:center;"></td>
+      </tr>
+    </table>
+
+    <input type="file" multiple accept="image/*" onchange="storeImages(event,'remedial')" />
+    <div id="remedial-counter" style="font-size:12px; color:#15445a; font-weight:bold;">عدد الصور المرفوعة: 0 / 4</div>
+    <div id="remedial-preview"></div>
+
+    <div style="display:flex; justify-content:center; gap:30px; margin-top:10px;" id="directorField2">
+      <div style="width:200px;"><label>اسم المعلمة</label><input type="text" /></div>
+      <div style="width:200px;"><label>مديرة المدرسة</label><input type="text" /></div>
+    </div>
+
+    <button class="printBtn" onclick="printPDF('content2')">طباعة الخطة العلاجية</button>
+  </div>
+</div>
+
+<script>
+let uploadedImages = {enrichment:[], remedial:[]};
+document.addEventListener("DOMContentLoaded", function() {
+  const dateIds = ['date1', 'date2']; // ضع أسماء المعرفات هنا
+
+  dateIds.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      flatpickr(input, {
+        locale: 'ar',
+        disableMobile: true,
+        altInput: true,
+        altFormat: 'd-MM-yyyy هـ',
+        dateFormat: 'Y-m-d',
+        onChange: function(selectedDates, dateStr, instance) {
+          if (selectedDates.length > 0) {
+            const miladi = selectedDates[0];
+             miladi.setDate(miladi.getDate() - 1);
+
+            const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).format(miladi);
+            instance.altInput.value = hijri;
+          }
+        }
+      });
+    }
+  });
+});
+
+flatpickr('#date1',{locale:'ar',dateFormat:'d-m-Y',altInput:true,altFormat:'d-m-Y'});
+flatpickr('#date2',{locale:'ar',dateFormat:'d-m-Y',altInput:true,altFormat:'d-m-Y'});
+
+// التبويبات
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.target).classList.add('active');
+  });
+});
+
+// رفع الصور مع الحد الأقصى 4
+function storeImages(event, sectionId){
+  let files = Array.from(event.target.files);
+  if(files.length + uploadedImages[sectionId].length > 4){
+    alert('يمكن رفع 4 صور فقط لكل تبويب.');
+    files = files.slice(0, 4 - uploadedImages[sectionId].length);
+  }
+  files.forEach(file=>{
+    uploadedImages[sectionId].push(file);
+  });
+
+  const preview = document.getElementById(sectionId+'-preview');
+  preview.innerHTML='';
+  uploadedImages[sectionId].forEach((file,index)=>{
+    const wrapper = document.createElement('div');
+    wrapper.className='preview-image-wrapper';
+    const img = document.createElement('img');
+    const reader = new FileReader();
+    reader.onload = e=>{ img.src=e.target.result; }
+    reader.readAsDataURL(file);
+
+    const removeBtn = document.createElement('div');
+    removeBtn.className='remove-img-btn';
+    removeBtn.innerText='×';
+    removeBtn.onclick=()=>{
+      uploadedImages[sectionId].splice(index,1);
+      storeImages({target:{files:[]}},sectionId);
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(removeBtn);
+    preview.appendChild(wrapper);
+  });
+
+  document.getElementById(sectionId+'-counter').innerText=`عدد الصور المرفوعة: ${uploadedImages[sectionId].length} / 4`;
+}
+
+// طباعة PDF
+function printPDF(tabId){
+  const btns = document.querySelectorAll('.printBtn'); 
+  btns.forEach(b => b.style.display = 'none');
+
+  const element = document.getElementById(tabId).cloneNode(true);
+
+  // إزالة الأزرار وحقول الملفات
+  element.querySelectorAll(
+    'button,input[type="file"],#enrichment-counter,#enrichment-preview .remove-img-btn,#remedial-counter,#remedial-preview .remove-img-btn'
+  ).forEach(el => el.remove());
+
+  // تنظيم الصور للطباعة فوق المديرة
+  let imageContainer = document.createElement('div');
+  imageContainer.className = 'print-image-wrapper';
+  imageContainer.style.marginBottom = '10px'; // مسافة عن حقل المديرة
+
+  const allImages = element.querySelectorAll('.preview-image-wrapper img');
+  allImages.forEach(img => {
+    img.style.width = '150px';
+    img.style.height = '125px';
+    img.style.objectFit = 'cover';
+    imageContainer.appendChild(img);
+  });
+
+  // وضع الصور قبل حقل المديرة
+  const directorField = element.querySelector('#directorField') || element.querySelector('#directorField2');
+  if(directorField){
+    element.insertBefore(imageContainer, directorField);
+  }
+
+  // إعداد التغليف مع الخلفية
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'relative';
+  wrapper.style.width = '210mm';
+  wrapper.style.height = '296.5mm';
+ wrapper.style.padding = '22mm 10mm 20mm 10mm';
+  wrapper.style.boxSizing = 'border-box';
+  wrapper.style.backgroundImage = tabId==='content1' ? 'url("images/background.png")' : 'url("images/background1.png")';
+  wrapper.style.backgroundSize = 'cover';
+  wrapper.style.backgroundRepeat = 'no-repeat';
+  wrapper.style.backgroundPosition = 'center';
+  wrapper.appendChild(element);
+
+  html2pdf().set({
+    margin: 0,
+    filename: tabId==='content1' ? 'تقرير-الخطة-الإثرائية.pdf' : 'تقرير-الخطة-العلاجية.pdf',
+    image: {type:'jpeg', quality:0.98},
+    html2canvas: {scale:2, backgroundColor:null, useCORS:true},
+    jsPDF: {unit:'mm', format:'a4', orientation:'portrait'}
+  }).from(wrapper).save().then(()=>{
+    btns.forEach(b => b.style.display='block');
+  });
+}
+</script>
+</body>
+</html>

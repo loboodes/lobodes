@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>برامج وخدمات التوجيه الطلابي</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<style>
+/* الخط */
+@font-face {
+  font-family: 'HelveticaNeueW23';
+  src: url('./fonts/HelveticaNeueW23-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body, input, label, button, header, footer { 
+  font-family: 'HelveticaNeueW23', sans-serif; 
+  margin:0; padding:0;
+}
+
+body{
+  background:#f9f9f9;
+}
+
+/* الهيدر بهويتك */
+header {
+  background:#15445a;
+  color:white;
+  text-align:center;
+  padding:12px;
+}
+header h1 { margin:0; font-size:18px; }
+
+/* شريط التبويبات */
+.tabs { 
+  display:grid; 
+  grid-template-columns:repeat(2,1fr); 
+  background:#e4f3ec; 
+}
+.tab-button { 
+  padding:10px; 
+  cursor:pointer; 
+  text-align:center; 
+  background:#e4f3ec; 
+  color:#15445a; 
+  border:none; 
+  font-size:14px; 
+  font-weight:bold; 
+}
+.tab-button.active { 
+  background:#0c8380; 
+  color:white; 
+}
+
+/* محتوى التبويب */
+.tab-content { 
+  display:none; 
+  padding:15px; 
+  background:#ffffff;
+}
+.tab-content.active { display:block; }
+
+label { 
+  display:block; 
+  margin:5px 0 2px; 
+  font-weight:bold; 
+  font-size:12px; 
+  text-align:center; 
+}
+
+input, select { 
+  width:100%; 
+  padding:4px; 
+  border:1px solid #c2c1c1; 
+  border-radius:4px; 
+  margin-bottom:5px; 
+  box-sizing:border-box; 
+  font-size:12px; 
+  text-align:center; 
+  background:#ffffff;
+}
+
+button { 
+  background:#0c8380; 
+  color:white; 
+  border:none; 
+  padding:8px 10px; 
+  margin:5px 0; 
+  cursor:pointer; 
+  border-radius:6px; 
+  width:100%; 
+  font-size:14px; 
+  font-weight:bold; 
+}
+
+footer { 
+  text-align:center; 
+  padding:10px; 
+  color:#333; 
+  font-weight:bold; 
+  font-size:12px; 
+  background:#ffffff; 
+}
+
+/* للطباعة */
+@media print {
+  @page { size: A4 portrait; margin:0; }
+  body { 
+    width: 210mm; 
+    height: 297mm; 
+    margin:0; 
+    font-family: 'HelveticaNeueW23', sans-serif; 
+    background:none !important;
+  }
+  .tab-content { display:block !important; }
+  button, .tab-button, .tabs, footer { display:none !important; }
+
+  label { 
+    font-size:14px !important; 
+    font-weight:bold; 
+    background: transparent !important; 
+  }
+
+  input, select { 
+    font-size:14px !important; 
+    text-align:center; 
+    border-color:#aaa; 
+    background:transparent; 
+    color:black; 
+  }
+
+  .preview img, .tab-content img, canvas { 
+    max-width:150px; 
+    max-height:150px; 
+    object-fit:cover; 
+    display:block; 
+    margin:5px auto; 
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>برامج و خدمات التوجيه الطلابي</h1>
+</header>
+
+<div class="tabs">
+ <button class="tab-button active" onclick="openTab('culture', event)">برنامج التهيئة الإرشادية</button>
+ <button class="tab-button" onclick="openTab('science', event)">برنامج التوجيه المهني</button>
+ <button class="tab-button" onclick="openTab('violence', event)">برنامج خفض العنف - رفق</button>
+ <button class="tab-button" onclick="openTab('familyRelations', event)">برنامج توثيق علاقات الأسرة مع المدرسة</button>
+ <button class="tab-button" onclick="openTab('psychSkills', event)">برنامج تعزيز المهارات النفسية والاجتماعية</button>
+ <button class="tab-button" onclick="openTab('positiveBehavior', event)">برنامج السلوك الإيجابي</button>
+ <button class="tab-button" onclick="openTab('specialSupport', event)">برنامج رعاية ودعم الفئات الخاصة</button>
+ <button class="tab-button" onclick="openTab('absentStudents', event)">برنامج رعاية الطالبات متكرري الغياب</button>
+ <button class="tab-button" onclick="openTab('studentCouncil', event)">برنامج المجلس الطلابي</button>
+ <button class="tab-button" onclick="openTab('graduation', event)">برنامج الاحتفاء بالطالبات الخريجين</button>
+</div>
+
+<!-- القالب الأساسي لجميع البرامج -->
+<div id="culture" class="tab-content active">
+  <label style="font-size:16px; font-weight:bold; text-align:center;">برنامج التهيئة الإرشادية</label>
+
+  <!-- بدون إدارة التعليم واسم المدرسة -->
+
+  <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+    <div style="width:200px;"><label>اليوم</label><input type="text"></div>
+    <div style="width:200px;"><label>التاريخ</label><input type="text" class="date" placeholder="اختر التاريخ" readonly /></div>
+  </div>
+
+  <div style="display:flex; gap:10px; justify-content:center; align-items:center; margin-bottom:10px;">
+    <div style="width:150px;">
+      <label>الفئة المستهدفة</label>
+      <input type="text" style="width:100%; height:30px;">
+    </div>
+    <div style="display:flex; align-items:center; gap:5px;">
+      <canvas class="chart" width="120" height="120" style="border:1px solid #ccc; border-radius:50%; background:#ffffff;"></canvas>
+      <div style="width:130px;">
+        <label>مؤشر التحقق</label>
+        <select class="indicator" style="width:100%; height:30px; text-align:center;">
+          <option value="0">0%</option>
+          <option value="10">10%</option>
+          <option value="20">20%</option>
+          <option value="30">30%</option>
+          <option value="40">40%</option>
+          <option value="50">50%</option>
+          <option value="60">60%</option>
+          <option value="70">70%</option>
+          <option value="80">80%</option>
+          <option value="90">90%</option>
+          <option value="100">100%</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <label>أهداف البرنامج</label>
+  <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px;">
+    <input type="text"><input type="text">
+    <input type="text"><input type="text">
+    <input type="text"><input type="text">
+  </div>
+
+  <label>إجراءات التنفيذ</label>
+  <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px;">
+    <input type="text"><input type="text">
+    <input type="text"><input type="text">
+    <input type="text"><input type="text">
+  </div>
+
+  <label>الشواهد</label>
+  <input type="file" multiple accept="image/*" onchange="storeImages(event)">
+  <div class="counter" style="font-size:12px; color:#15445a; font-weight:bold;"></div>
+  <div class="preview" style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;"></div>
+
+  <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:5px; margin-top:10px;">
+    <div><label>الموجهة الطلابية</label><input type="text"></div>
+    <div><label>مديرة المدرسة</label><input type="text"></div>
+  </div>
+
+  <button onclick="printPDF(this)">طباعة التقرير</button>
+</div>
+
+<script>
+// قائمة البرامج الأخرى (تستخدم نفس القالب)
+const tabsList = [
+  {id:'science', name:'برنامج التوجيه المهني'},
+  {id:'violence', name:'برنامج خفض العنف - رفق'},
+  {id:'familyRelations', name:'برنامج توثيق علاقات الأسرة مع المدرسة'},
+  {id:'psychSkills', name:'برنامج تعزيز المهارات النفسية والاجتماعية'},
+  {id:'positiveBehavior', name:'برنامج السلوك الإيجابي'},
+  {id:'specialSupport', name:'برنامج رعاية ودعم الفئات الخاصة'},
+  {id:'absentStudents', name:'برنامج رعاية الطالبات متكرري الغياب'},
+  {id:'studentCouncil', name:'برنامج المجلس الطلابي'},
+  {id:'graduation', name:'برنامج الاحتفاء بالطالبات الخريجين'}
+];
+
+// إنشاء تبويبات بنفس قالب culture مع تغيير العنوان فقط
+tabsList.forEach(t => {
+  const tab = document.createElement('div');
+  tab.id = t.id;
+  tab.className = 'tab-content';
+  tab.innerHTML = document.getElementById('culture').innerHTML.replace('برنامج التهيئة الإرشادية', t.name);
+  document.body.appendChild(tab);
+});
+
+// فتح التبويب
+function openTab(tabId, evt){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-button').forEach(el=>el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  if(evt) evt.currentTarget.classList.add('active');
+}
+
+// رسم المؤشر الدائري
+function updateChart(canvas, value){
+  const ctx = canvas.getContext("2d");
+  const cx = canvas.width/2, cy = canvas.height/2, r = 50;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // الخلفية
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2*Math.PI);
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.lineWidth = 8;
+  ctx.stroke();
+
+  // الجزء الملون حسب النسبة
+  const endAngle = (value/100)*2*Math.PI;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, -0.5*Math.PI, endAngle-0.5*Math.PI);
+  ctx.strokeStyle = "#10b981"; /* أخضر من هويتك */
+  ctx.lineWidth = 8;
+  ctx.stroke();
+
+  // النص في الوسط
+  ctx.fillStyle = "#111827";
+  ctx.font = "bold 20px 'HelveticaNeueW23'";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(value+"%", cx, cy);
+}
+
+// تهيئة كل المؤشرات
+function initCharts(){
+  document.querySelectorAll(".indicator").forEach(indicator => {
+    const canvas = indicator.closest('div').previousElementSibling;
+    function draw(){ updateChart(canvas, parseInt(indicator.value)); }
+    indicator.addEventListener('change', draw);
+    draw();
+  });
+}
+
+window.onload = initCharts;
+
+let uploadedImages = {};
+
+// التاريخ (ميلادي مدخل، مع عرض هجري في altInput)
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll("input.date").forEach(input => {
+    flatpickr(input, {
+      locale: 'ar',
+      disableMobile: true,
+      altInput: true,
+      altFormat: 'd-MM-yyyy هـ',
+      dateFormat: 'Y-m-d',
+      onChange: function(selectedDates, dateStr, instance) {
+        if (selectedDates.length > 0) {
+          const miladi = selectedDates[0];
+          miladi.setDate(miladi.getDate() - 1);
+          const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          }).format(miladi);
+          instance.altInput.value = hijri;
+        }
+      }
+    });
+  });
+});
+
+// تخزين الصور لكل تبويب
+function storeImages(event){
+  const tabId = event.target.closest('.tab-content').id;
+  const files = event.target.files;
+  if(!uploadedImages[tabId]) uploadedImages[tabId] = [];
+  if(uploadedImages[tabId].length + files.length > 4){
+    alert("مسموح رفع 4 صور فقط");
+    event.target.value="";
+    return;
+  }
+  for(let i=0;i<files.length;i++){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      uploadedImages[tabId].push(e.target.result);
+      updatePreview(tabId);
+      saveTabData(tabId);
+    }
+    reader.readAsDataURL(files[i]);
+  }
+}
+
+// عرض معاينة الصور
+function updatePreview(tabId){
+  const tabContent = document.getElementById(tabId);
+  const previewDiv = tabContent.querySelector('.preview');
+  const counter = tabContent.querySelector('.counter');
+  if(!previewDiv) return;
+  previewDiv.innerHTML = '';
+
+  const imgs = uploadedImages[tabId] || [];
+  if(counter){
+    counter.textContent = imgs.length ? ("عدد الصور المرفوعة: " + imgs.length + " / 4") : "";
+    counter.style.color = imgs.length >= 4 ? 'red' : '#15445a';
+  }
+
+  imgs.forEach((src,index)=>{
+    const imgWrapper = document.createElement('div');
+    imgWrapper.style.position = 'relative';
+    imgWrapper.style.display = 'inline-block';
+    imgWrapper.style.margin = '2px';
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.width = '80px';
+    img.style.height = '80px';
+    img.style.objectFit = 'cover';
+    imgWrapper.appendChild(img);
+
+    const delBtn = document.createElement('div');
+    delBtn.textContent = '×';
+    delBtn.style.position = 'absolute';
+    delBtn.style.top = '5px';
+    delBtn.style.left = '50%';
+    delBtn.style.transform = 'translateX(-50%)';
+    delBtn.style.width = '24px';
+    delBtn.style.height = '24px';
+    delBtn.style.background = '#d50000';
+    delBtn.style.color = 'white';
+    delBtn.style.border = '2px solid white';
+    delBtn.style.borderRadius = '50%';
+    delBtn.style.display = 'flex';
+    delBtn.style.alignItems = 'center';
+    delBtn.style.justifyContent = 'center';
+    delBtn.style.fontSize = '16px';
+    delBtn.style.fontWeight = 'bold';
+    delBtn.title = 'حذف الصورة';
+
+    delBtn.addEventListener('click', ()=>{
+      uploadedImages[tabId].splice(index,1);
+      updatePreview(tabId);
+      saveTabData(tabId);
+    });
+
+    imgWrapper.appendChild(delBtn);
+    previewDiv.appendChild(imgWrapper);
+  });
+}
+
+// حفظ واسترجاع البيانات من localStorage
+function saveTabData(tabId){
+  const tabContent = document.getElementById(tabId);
+  const inputs = tabContent.querySelectorAll('input[type="text"]');
+  const indicators = tabContent.querySelectorAll('select.indicator');
+  const data = Array.from(inputs).map(input=>input.value);
+  const dataIndicator = Array.from(indicators).map(sel=>sel.value);
+  localStorage.setItem('tabData_'+tabId, JSON.stringify({
+    data,
+    dataIndicator,
+    dataImages: uploadedImages[tabId] || []
+  }));
+}
+
+function loadTabData(tabId){
+  const saved = localStorage.getItem('tabData_'+tabId);
+  if(saved){
+    const obj = JSON.parse(saved);
+    const tab = document.getElementById(tabId);
+    const inputs = tab.querySelectorAll('input[type="text"]');
+    inputs.forEach((input,i)=>{ input.value = obj.data[i] || ''; });
+    const indicators = tab.querySelectorAll('select.indicator');
+    indicators.forEach((sel,i)=>{ sel.value = obj.dataIndicator[i] || '0'; });
+    uploadedImages[tabId] = obj.dataImages || [];
+    updatePreview(tabId);
+  }
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.tab-content').forEach(tab=>{
+    loadTabData(tab.id);
+  });
+
+  document.querySelectorAll('input[type="text"], select.indicator').forEach(input=>{
+    input.addEventListener('input',()=>{
+      const t = input.closest('.tab-content');
+      if(t) saveTabData(t.id);
+    });
+  });
+});
+
+// طباعة PDF
+function printPDF(btn){
+  const tabContent = btn.closest('.tab-content');
+  const tabId = tabContent.id;
+
+  const clone = tabContent.cloneNode(true);
+  clone.querySelectorAll('button,input[type="file"],.counter,.preview').forEach(el=>el.remove());
+
+  // تحديث قيم المؤشرات في النسخة
+  clone.querySelectorAll('.indicator').forEach((sel,index)=>{
+    const original = tabContent.querySelectorAll('.indicator')[index];
+    sel.value = original.value;
+  });
+
+  // تحويل كل canvas لرسم نهائي ثم صورة
+  clone.querySelectorAll('canvas.chart').forEach((canvas,index)=>{
+    const indicatorClone = clone.querySelectorAll('.indicator')[index];
+    const value = parseInt(indicatorClone.value);
+    const ctx = canvas.getContext("2d");
+    const cx = canvas.width/2, cy = canvas.height/2, r = 50;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 2*Math.PI);
+    ctx.strokeStyle = "#e5e7eb"; ctx.lineWidth = 8; ctx.stroke();
+
+    const endAngle = (value/100)*2*Math.PI;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, -0.5*Math.PI, endAngle-0.5*Math.PI);
+    ctx.strokeStyle = "#10b981"; ctx.lineWidth = 8; ctx.stroke();
+
+    ctx.fillStyle = "#111827";
+    ctx.font = "bold 20px 'HelveticaNeueW23'";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(value+"%", cx, cy);
+
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL("image/png");
+    img.style.width = canvas.width + 'px';
+    img.style.height = canvas.height + 'px';
+    canvas.parentNode.replaceChild(img, canvas);
+  });
+
+  // صور الشواهد (بحد أقصى 4) قبل التوقيع
+  const tabImages = (uploadedImages[tabId] || []).slice(0,4);
+  if(tabImages.length > 0){
+    const imagesWrapper = document.createElement('div');
+    imagesWrapper.style.display = 'flex';
+    imagesWrapper.style.justifyContent = 'center';
+    imagesWrapper.style.gap = '5px';
+    imagesWrapper.style.margin = '10px 0';
+
+    tabImages.forEach(src=>{
+      const img = document.createElement('img');
+      img.src = src;
+      img.style.width = '150px';
+      img.style.height = '150px';
+      img.style.objectFit = 'cover';
+      imagesWrapper.appendChild(img);
+    });
+
+    const signBlock = Array.from(clone.querySelectorAll('div')).find(div => 
+      div.innerText.includes('الموجهة الطلابية') || div.innerText.includes('مديرة المدرسة')
+    );
+    if(signBlock){
+      clone.insertBefore(imagesWrapper, signBlock);
+    }else{
+      clone.appendChild(imagesWrapper);
+    }
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.style.width = '210mm';
+  wrapper.style.height = '296.5mm';
+  wrapper.style.paddingTop = '40mm';
+  wrapper.style.paddingBottom = '20mm';
+  wrapper.style.paddingLeft = '10mm';
+  wrapper.style.paddingRight = '10mm';
+  wrapper.style.boxSizing = 'border-box';
+  wrapper.style.backgroundImage = "url('./images/background.png')";
+  wrapper.style.backgroundSize = 'cover';
+  wrapper.style.backgroundRepeat = 'no-repeat';
+  wrapper.style.backgroundPosition = 'center';
+  wrapper.appendChild(clone);
+
+  html2pdf().set({
+    margin: 0,
+    filename: tabId+'-report.pdf',
+    image: { type:'jpeg', quality:0.95 },
+    html2canvas: { scale:3, useCORS:true, backgroundColor:null },
+    jsPDF: { unit:'mm', format:'a4', orientation:'portrait' }
+  }).from(wrapper).save();
+}
+
+// زر حذف البيانات لكل تبويب
+document.querySelectorAll('.tab-content').forEach(tab=>{
+  const delBtn = document.createElement('button');
+  delBtn.textContent = 'حذف البيانات';
+  delBtn.style.background = 'red';
+  delBtn.style.color = 'white';
+  delBtn.style.marginTop = '5px';
+  delBtn.addEventListener('click', ()=>{
+    if(!confirm('هل تريدين حذف جميع البيانات لهذا البرنامج؟')) return;
+    localStorage.removeItem('tabData_'+tab.id);
+    tab.querySelectorAll('input[type="text"]').forEach(i=>i.value='');
+    tab.querySelectorAll('select.indicator').forEach(s=>s.value='0');
+    uploadedImages[tab.id] = [];
+    updatePreview(tab.id);
+    initCharts();
+  });
+  tab.appendChild(delBtn);
+});
+</script>
+
+</body>
+</html>
